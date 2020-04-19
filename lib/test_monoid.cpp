@@ -8,6 +8,7 @@ using namespace std;
 
 void test_monoid_pow() {
     using M = ModuloProductMonoid;
+
     assert(monoid_pow<M>(1LL, 1) == 1LL);
     assert(monoid_pow<M>(2LL, 20) == 1048576LL);
     assert(monoid_pow<M>(3LL, 10000) == 895629451LL);
@@ -24,8 +25,16 @@ void test_pair_monoid() {
     assert(M::identity() == make_pair(1LL, string("")));
 }
 
+void test_cumulative() {
+    using M = SumMonoid;
+
+    auto v1 = cumulative<M>({});
+    assert(v1.empty());
+}
+
 int main() {
     test_monoid_pow();
     test_pair_monoid();
+    test_cumulative();
     cout << "OK" << endl;
 }

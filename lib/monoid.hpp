@@ -1,6 +1,8 @@
-// モノイドの冪乗を求める
-template <typename Traits, typename Monoid>
-Monoid monoid_pow(Monoid base, int exponent) {
+template <typename Traits>
+auto monoid_pow(typename Traits::Monoid base, int exponent)
+{
+    using Monoid = typename Traits::Monoid;
+
     Monoid ans = Traits::identity();
     while (exponent > 0) {
         if (exponent & 1) {
@@ -12,58 +14,84 @@ Monoid monoid_pow(Monoid base, int exponent) {
     return ans;
 }
 
+template <typename Traits>
+auto monoid_concat(const vector<typename Traits::Monoid>& xs)
+{
+    using Monoid = typename Traits::Monoid;
+
+    Monoid acc = Traits::identity();
+    for (const auto& x : xs) {
+        acc = Traits::op(acc, x);
+    }
+    return acc;
+}
+
+template <typename Traits>
+auto cumulative(const vector<typename Traits::Monoid>& xs)
+{
+    using Monoid = typename Traits::Monoid;
+
+    vector<Monoid> result;
+    Monoid acc = Traits::identity();
+    for (const auto& x : xs) {
+        acc = Traits::op(acc, x);
+        result.push_back(acc);
+    }
+    return result;
+}
+
 //-----------------------------------------------------------------------------
 // モノイドの例
 
 // 加算によるモノイド
 struct SumMonoid {
-    using ValueType = long long;
+    using Monoid = long long;
 
-    static constexpr ValueType identity() {
+    static constexpr Monoid identity() {
         return 0;
     }
 
-    static ValueType op(ValueType lhs, ValueType rhs) {
+    static Monoid op(Monoid lhs, Monoid rhs) {
         return lhs + rhs;
     }
 };
 
 // 乗法によるモノイド
 struct ProductMonoid {
-    using ValueType = long long;
+    using Monoid = long long;
 
-    static constexpr ValueType identity() {
+    static constexpr Monoid identity() {
         return 1;
     }
 
-    static ValueType op(ValueType lhs, ValueType rhs) {
+    static Monoid op(Monoid lhs, Monoid rhs) {
         return lhs * rhs;
     }
 };
 
 // MOD を法とする乗法によるモノイド
 struct ModuloProductMonoid {
-    using ValueType = long long;
+    using Monoid = long long;
 
-    static constexpr ValueType identity() {
+    static constexpr Monoid identity() {
         return 1;
     }
 
-    static ValueType op(ValueType lhs, ValueType rhs) {
-        static const ValueType MOD = 1000000007;
+    static Monoid op(Monoid lhs, Monoid rhs) {
+        static const Monoid MOD = 1000000007;
         return (lhs * rhs) % MOD;
     }
 };
 
 // 文字列モノイド
 struct StringMonoid {
-    using ValueType = string;
+    using Monoid = string;
 
-    static ValueType identity() {
+    static Monoid identity() {
         return "";
     }
 
-    static ValueType op(const ValueType& lhs, const ValueType& rhs) {
+    static Monoid op(const Monoid& lhs, const Monoid& rhs) {
         return lhs + rhs;
     }
 };
@@ -71,16 +99,16 @@ struct StringMonoid {
 // TとUがそれぞれモノイドであるならば、pair<T, U> もモノイド
 template <typename TraitsT, typename TraitsU>
 struct PairMonoid {
-    using ValueType = pair<typename TraitsT::ValueType, typename TraitsU::ValueType>;
+    using Monoid = pair<typename TraitsT::Monoid, typename TraitsU::Monoid>;
 
-    static constexpr ValueType identity() {
+    static constexpr Monoid identity() {
         return {
             TraitsT::identity(),
             TraitsU::identity(),
         };
     }
 
-    static ValueType op(ValueType lhs, ValueType rhs) {
+    static Monoid op(Monoid lhs, Monoid rhs) {
         return {
             TraitsT::op(lhs.first, rhs.first),
             TraitsU::op(lhs.second, rhs.second),
