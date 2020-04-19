@@ -1,12 +1,10 @@
-template <typename T>
-struct MonoidTrait {
-    MonoidTrait() = delete;
-};
+template <typename Monoid>
+struct MonoidTraits;
 
 // モノイドの冪乗を求める
 template <typename Monoid>
 Monoid monoid_pow(Monoid base, int exponent) {
-    using M = MonoidTrait<Monoid>;
+    using M = MonoidTraits<Monoid>;
 
     Monoid ans = M::identity();
     while (exponent > 0) {
@@ -24,7 +22,7 @@ Monoid monoid_pow(Monoid base, int exponent) {
 
 // MOD を法とする乗法によるモノイド
 template <>
-struct MonoidTrait<long long> {
+struct MonoidTraits<long long> {
     static const long long MOD = 1000000007;
 
     static long long identity() {
@@ -38,7 +36,7 @@ struct MonoidTrait<long long> {
 
 // 文字列モノイド
 template <>
-struct MonoidTrait<string> {
+struct MonoidTraits<string> {
     static string identity() {
         return "";
     }
@@ -50,18 +48,18 @@ struct MonoidTrait<string> {
 
 // TとUがそれぞれモノイドであるならば、pair<T, U> もモノイド
 template <typename T, typename U>
-struct MonoidTrait<pair<T, U>> {
+struct MonoidTraits<pair<T, U>> {
     static pair<T, U> identity() {
         return {
-            MonoidTrait<T>::identity(),
-            MonoidTrait<U>::identity(),
+            MonoidTraits<T>::identity(),
+            MonoidTraits<U>::identity(),
         };
     }
 
     static pair<T, U> op(pair<T, U> lhs, pair<T, U> rhs) {
         return {
-            MonoidTrait<T>::op(lhs.first, rhs.first),
-            MonoidTrait<U>::op(lhs.second, rhs.second),
+            MonoidTraits<T>::op(lhs.first, rhs.first),
+            MonoidTraits<U>::op(lhs.second, rhs.second),
         };
     }
 };

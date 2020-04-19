@@ -1,10 +1,10 @@
-#include <iostream>
 #include <cassert>
+#include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 #include "monoid.hpp"
-#include "debug.hpp"
 
 void test_monoid_pow() {
     assert(monoid_pow(1LL, 1) == 1LL);
@@ -14,7 +14,7 @@ void test_monoid_pow() {
 }
 
 void test_pair_monoid() {
-    using M = MonoidTrait<pair<long long, string>>;
+    using M = MonoidTraits<pair<long long, string>>;
 
     pair<long long, string> a = {100, "hello"};
     pair<long long, string> b = {200, " world"};
