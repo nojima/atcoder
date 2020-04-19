@@ -7,14 +7,15 @@ using namespace std;
 #include "monoid.hpp"
 
 void test_monoid_pow() {
-    assert(monoid_pow(1LL, 1) == 1LL);
-    assert(monoid_pow(2LL, 20) == 1048576LL);
-    assert(monoid_pow(3LL, 10000) == 895629451LL);
-    assert(monoid_pow(2LL, 0) == 1LL);
+    using M = ModuloProductMonoid;
+    assert(monoid_pow<M>(1LL, 1) == 1LL);
+    assert(monoid_pow<M>(2LL, 20) == 1048576LL);
+    assert(monoid_pow<M>(3LL, 10000) == 895629451LL);
+    assert(monoid_pow<M>(2LL, 0) == 1LL);
 }
 
 void test_pair_monoid() {
-    using M = MonoidTraits<pair<long long, string>>;
+    using M = PairMonoid<ModuloProductMonoid, StringMonoid>;
 
     pair<long long, string> a = {100, "hello"};
     pair<long long, string> b = {200, " world"};

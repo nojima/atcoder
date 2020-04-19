@@ -1,17 +1,12 @@
-template <typename Monoid>
-struct MonoidTraits;
-
 // モノイドの冪乗を求める
-template <typename Monoid>
+template <typename Traits, typename Monoid>
 Monoid monoid_pow(Monoid base, int exponent) {
-    using M = MonoidTraits<Monoid>;
-
-    Monoid ans = M::identity();
+    Monoid ans = Traits::identity();
     while (exponent > 0) {
         if (exponent & 1) {
-            ans = M::op(ans, base);
+            ans = Traits::op(ans, base);
         }
-        base = M::op(base, base);
+        base = Traits::op(base, base);
         exponent >>= 1;
     }
     return ans;
@@ -20,46 +15,75 @@ Monoid monoid_pow(Monoid base, int exponent) {
 //-----------------------------------------------------------------------------
 // モノイドの例
 
-// MOD を法とする乗法によるモノイド
-template <>
-struct MonoidTraits<long long> {
-    static const long long MOD = 1000000007;
+// 加算によるモノイド
+struct SumMonoid {
+    using ValueType = long long;
 
-    static long long identity() {
+    static constexpr ValueType identity() {
+        return 0;
+    }
+
+    static ValueType op(ValueType lhs, ValueType rhs) {
+        return lhs + rhs;
+    }
+};
+
+// 乗法によるモノイド
+struct ProductMonoid {
+    using ValueType = long long;
+
+    static constexpr ValueType identity() {
         return 1;
     }
 
-    static long long op(long long lhs, long long rhs) {
+    static ValueType op(ValueType lhs, ValueType rhs) {
+        return lhs * rhs;
+    }
+};
+
+// MOD を法とする乗法によるモノイド
+struct ModuloProductMonoid {
+    using ValueType = long long;
+
+    static constexpr ValueType identity() {
+        return 1;
+    }
+
+    static ValueType op(ValueType lhs, ValueType rhs) {
+        static const ValueType MOD = 1000000007;
         return (lhs * rhs) % MOD;
     }
 };
 
 // 文字列モノイド
-template <>
-struct MonoidTraits<string> {
-    static string identity() {
+struct StringMonoid {
+    using ValueType = string;
+
+    static ValueType identity() {
         return "";
     }
 
-    static string op(const string& lhs, const string& rhs) {
+    static ValueType op(const ValueType& lhs, const ValueType& rhs) {
         return lhs + rhs;
     }
 };
 
 // TとUがそれぞれモノイドであるならば、pair<T, U> もモノイド
-template <typename T, typename U>
-struct MonoidTraits<pair<T, U>> {
-    static pair<T, U> identity() {
+template <typename TraitsT, typename TraitsU>
+struct PairMonoid {
+    using ValueType = pair<typename TraitsT::ValueType, typename TraitsU::ValueType>;
+
+    static constexpr ValueType identity() {
         return {
-            MonoidTraits<T>::identity(),
-            MonoidTraits<U>::identity(),
+            TraitsT::identity(),
+            TraitsU::identity(),
         };
     }
 
-    static pair<T, U> op(pair<T, U> lhs, pair<T, U> rhs) {
+    static ValueType op(ValueType lhs, ValueType rhs) {
         return {
-            MonoidTraits<T>::op(lhs.first, rhs.first),
-            MonoidTraits<U>::op(lhs.second, rhs.second),
+            TraitsT::op(lhs.first, rhs.first),
+            TraitsU::op(lhs.second, rhs.second),
         };
     }
 };
