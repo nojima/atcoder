@@ -1,21 +1,10 @@
 #include <iostream>
 #include <cassert>
+#include <string>
 using namespace std;
 
 #include "monoid.hpp"
-
-template <>
-struct MonoidTrait<long long> {
-    static const long long MOD = 1000000007;
-
-    static long long identity() {
-        return 1;
-    }
-
-    static int op(long long lhs, long long rhs) {
-        return (lhs * rhs) % MOD;
-    }
-};
+#include "debug.hpp"
 
 void test_monoid_pow() {
     assert(monoid_pow(1LL, 1) == 1LL);
@@ -24,7 +13,18 @@ void test_monoid_pow() {
     assert(monoid_pow(2LL, 0) == 1LL);
 }
 
+void test_pair_monoid() {
+    using M = MonoidTrait<pair<long long, string>>;
+
+    pair<long long, string> a = {100, "hello"};
+    pair<long long, string> b = {200, " world"};
+
+    assert(M::op(a, b) == make_pair(20000LL, string("hello world")));
+    assert(M::identity() == make_pair(1LL, string("")));
+}
+
 int main() {
     test_monoid_pow();
+    test_pair_monoid();
     cout << "OK" << endl;
 }
