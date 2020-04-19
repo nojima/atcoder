@@ -115,3 +115,20 @@ struct PairMonoid {
         };
     }
 };
+
+// Tがモノイドであるならば、optional<T> もモノイド
+template <typename TraitsT>
+struct OptionalMonoid {
+    using Monoid = optional<typename TraitsT::Monoid>;
+
+    static constexpr Monoid identity() {
+        return nullopt;
+    }
+
+    static Monoid op(Monoid lhs, Monoid rhs) {
+        if (!lhs && !rhs) { return nullopt; }
+        if (!lhs) { return rhs; }
+        if (!rhs) { return lhs; }
+        return TraitsT::op(*lhs, *rhs);
+    }
+};
