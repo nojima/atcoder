@@ -1,0 +1,2 @@
+#!/bin/sh
+g++ -Wall -O $1.cpp && ./a.out < $1.in
