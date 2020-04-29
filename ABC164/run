@@ -1,0 +1,2 @@
+#!/bin/sh
+g++ -Wall -std=c++14 -fsanitize=address -fdiagnostics-color=always  $1.cpp -o $1 && ./$1
