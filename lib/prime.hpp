@@ -37,7 +37,7 @@ vector<bool> sieve(int n) {
 // O(sqrt(n))
 vector<pair<int, int>> prime_factorization(const vector<int>& primes, int n) {
     vector<pair<int, int>> factors;
-    for (p : primes) {
+    for (auto p : primes) {
         if (p*p > n) { break; }
         int cnt = 0;
         while (n % p == 0) {
