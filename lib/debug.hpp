@@ -1,3 +1,7 @@
+#include <iostream>
+#include <vector>
+#include <optional>
+
 namespace std {
     template <typename T, typename U>
     ostream& operator<<(ostream& os, const pair<T, U>& p) {
@@ -18,6 +22,15 @@ namespace std {
             os << x;
         }
         os << "]";
+        return os;
+    }
+
+    template <typename T>
+    ostream& operator<<(ostream& os, const optional<T>& v) {
+        if (v)
+            os << *v;
+        else
+            os << "nullopt";
         return os;
     }
 }
