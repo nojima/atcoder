@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+if [ $# -ne 1 ]; then
+    echo "Usage: run SOURCE_FILE" >&2
+    exit 2
+fi
+
+if which clang++-10 >/dev/null 2>&1; then
+    CXX=clang++-10
+elif which clang++ >/dev/null 2>&1; then
+    CXX=clang++
+else
+    CXX=g++
+fi
+
+$CXX -std=c++17 -Wall -Wextra -Werror -fsanitize=address -O2 -g $1
+printf "%s \e[30;42;1m%s\e[m\n" "Compile:" " OK! "
+./a.out
