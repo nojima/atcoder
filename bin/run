@@ -14,6 +14,17 @@ else
     CXX=g++
 fi
 
-$CXX -std=c++17 -Wall -Wextra -Werror -fsanitize=address -O2 -g $1
+FLAGS="
+-std=c++17
+-Wall
+-Wextra
+-Werror
+-fsanitize=address
+-fsanitize=undefined
+-O2
+-g
+"
+
+"$CXX" $FLAGS "$1"
 printf "%s \e[30;42;1m%s\e[m\n" "Compile:" " OK! "
 ./a.out
