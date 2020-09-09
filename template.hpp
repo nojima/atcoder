@@ -4,6 +4,7 @@
 using namespace std;
 
 #define REP(i, n) for (int i = 0; i < (int)(n); ++i)
+#define ALL(c) (c).begin(), (c).end()
 
 int main() {
 }
