@@ -53,3 +53,19 @@ vector<pair<int, int>> prime_factorization(const vector<int>& primes, int n) {
     }
     return factors;
 }
+
+// すべての約数に対して f(divisor) を呼び出す。1は約数に含まない。
+template <class Func>
+void foreach_divisor(const vector<pair<int64_t, int>>& factors, Func f, int i = 0, int64_t d = 1) {
+    if (i == (int)factors.size()) {
+        if (d != 1) {
+            f(d);
+        }
+    } else {
+        auto [factor, power] = factors[i];
+        for (int k = 0; k <= power; ++k) {
+            if (k != 0) { d *= factor; }
+            foreach_divisor(factors, f, i+1, d);
+        }
+    }
+}
