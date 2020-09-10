@@ -1,70 +1,47 @@
-#include <iostream>
 #include <algorithm>
-#include <cstdio>
-#include <cstring>
-#include <string>
-#include <cassert>
+#include <iostream>
+#include <vector>
 using namespace std;
 
-const long long MOD = 1000000007;
+#define REP(i, n) for (int i = 0; i < (int)(n); ++i)
+#define ALL(c) (c).begin(), (c).end()
 
-long long pow_mod(long long n, long long p) {
+static const int64_t MOD = 1'000'000'007;
+
+inline int64_t add_mod(int64_t a, int64_t b) { return (a + b) % MOD; }
+inline int64_t sub_mod(int64_t a, int64_t b) { return (a - b + MOD) % MOD; }
+inline int64_t mul_mod(int64_t a, int64_t b) { return (a * b) % MOD; }
+
+int64_t pow_mod(int64_t n, int64_t p) {
     n %= MOD;
-    long long ans = 1;
+    int64_t ans = 1;
     while (p > 0) {
         if (p & 1) {
-            ans = (ans * n) % MOD;
+            ans = mul_mod(ans, n);
         }
-        n = (n * n) % MOD;
+        n = mul_mod(n, n);
         p >>= 1;
     }
     return ans;
 }
 
-long long sub_mod(long long a, long long b) {
-    return (a - b + MOD) % MOD;
-}
-
 int main() {
-    vector<int> primes;
-    primes.push_back(2);
-    for (int i = 3; i < 100000; i += 2) {
-        bool ok = true;
-        for (int j = 0; primes[j]*primes[j] <= i; ++j) {
-            if (i % primes[j] == 0) {
-                ok = false;
-                break;
-            }
+    int N, K; cin >> N >> K;
+
+    // g(i): gcd(A_1,..,A_N) = i となるような {A_1,..,A_N} の数
+    vector<int64_t> g(K+1);
+
+    for (int i = K; i > 0; --i) {
+        int64_t k = pow_mod(K/i, N);
+        for (int j = 2; i*j <= K; ++j) {
+            k = sub_mod(k, g[i*j]);
         }
-        if (ok) {
-            primes.push_back(i);
-        }
+        g[i] = k;
     }
 
-    long long N; cin >> N;
-    long long K; cin >> K;
-
-    long long S = 0;
-    for (int g = 1; g <= K; ++g) {
-        // gcd の結果が g になるような場合の数を数え上げる
-        S = (S + pow_mod(K/g, N)) % MOD;
-
-        // 素因数分解
-        vector<int> factors;
-        for (int p : primes) {
-            if (p*p > g) {
-                break;
-            }
-            while (g % p == 0) {
-                factors.push_back(p);
-                g /= p;
-            }
-        }
-
-        for (int f : factors) {
-            S = sub_mod(S, pow_mod())
-        }
+    int64_t ans = 0;
+    for (int i = 1; i <= K; ++i) {
+        ans = add_mod(ans, mul_mod(g[i], i));
     }
-
-    return 0;
+    cout << ans << '\n';
 }
