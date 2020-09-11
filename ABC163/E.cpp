@@ -5,7 +5,6 @@
 using namespace std;
 
 #define REP(i, n) for (int i = 0; i < (int)(n); ++i)
-#define FOR(i, a, b) for (int i = (int)(a); i < (int)(b); ++i)
 #define ALL(c) (c).begin(), (c).end()
 
 int main() {
@@ -15,10 +14,10 @@ int main() {
 
     vector<pair<int64_t, int>> indexed(N);
     REP(i, N) indexed[i] = {A[i], i};
-    sort(ALL(indexed), greater<pair<int, int>>());
+    sort(ALL(indexed), greater());
 
     // dp[L][R] = 左にL人、右にR人配置したときの嬉しさの最大値
-    vector<vector<int64_t>> dp(N+1, vector<int64_t>(N+1));
+    vector dp(N+1, vector(N+1, int64_t()));
     REP(L, N+1) REP(R, N-L+1) {
         if (L == 0 && R == 0) {
             dp[L][R] = 0;
