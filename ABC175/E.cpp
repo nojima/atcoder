@@ -22,7 +22,7 @@ int main() {
         items.insert({{r, c}, v});
     }
 
-    vector dp(R+1, vector(C, vector(4, numeric_limits<int64_t>::min())));
+    vector dp(2, vector(C, vector(4, numeric_limits<int64_t>::min())));
 
     dp[0][0][0] = 0;
     REP(y, R+1) REP(x, C) REP(k, 4) {
@@ -30,15 +30,15 @@ int main() {
             // (y, x) にアイテムが存在し、拾うことが可能な場合
             int64_t value = it->second;
             if (y+1 < R+1)
-                assign_max(dp[y+1][x][0], dp[y][x][k] + value);
+                assign_max(dp[(y+1)%2][x][0], dp[y%2][x][k] + value);
             if (x+1 < C)
-                assign_max(dp[y][x+1][k+1], dp[y][x][k] + value);
+                assign_max(dp[y%2][x+1][k+1], dp[y%2][x][k] + value);
         }
         if (y+1 < R+1)
-            assign_max(dp[y+1][x][0], dp[y][x][k]);
+            assign_max(dp[(y+1)%2][x][0], dp[y%2][x][k]);
         if (x+1 < C)
-            assign_max(dp[y][x+1][k], dp[y][x][k]);
+            assign_max(dp[y%2][x+1][k], dp[y%2][x][k]);
     }
 
-    cout << *max_element(ALL(dp[R][C-1])) << '\n';
+    cout << *max_element(ALL(dp[R%2][C-1])) << '\n';
 }
