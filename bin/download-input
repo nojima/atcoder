@@ -1,0 +1,34 @@
+#!/usr/bin/python3
+import argparse
+import requests
+import os.path as path
+import os
+from bs4 import BeautifulSoup
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("problem", metavar="PROBLEM")
+    args = parser.parse_args()
+
+    # カレントディレクトリからコンテスト名を取得
+    contest = path.basename(path.abspath(os.getcwd()))
+
+    download_input(contest, args.problem)
+
+def download_input(contest, problem):
+    url ="https://atcoder.jp/contests/{}/tasks/{}_{}".format(
+        contest.lower(), contest.lower(), problem.lower())
+    res = requests.get(url)
+    soup = BeautifulSoup(res.text, "html.parser")
+
+    inputs = []
+    for h3 in soup.find_all("h3"):
+        if not h3.get_text().startswith("Sample Input "):
+            continue
+        inputs.append(h3.next_sibling.get_text().replace("\r\n", "\n"))
+
+    with open("{}.in".format(problem.upper()), "w") as f:
+        f.write("\n----\n".join(inputs))
+
+if __name__ == "__main__":
+    main()

@@ -45,7 +45,7 @@ def run_binary_with_input(input_filename):
         separator = re.compile(r"^----$", re.MULTILINE)
         inputs = separator.split(f.read())
     for no, i in enumerate(inputs):
-        print("\n\033[30;47;1m{}\033[m".format(" Case #{}: ".format(no + 1)), flush=True)
+        print("\n\033[30;47;1m{}\033[m".format(" Case #{} ".format(no + 1)), flush=True)
         res = subprocess.run(["./a.out"], input=i.encode())
         if res.returncode != 0:
             sys.exit(1)
