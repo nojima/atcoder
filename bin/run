@@ -1,30 +1,67 @@
-#!/bin/sh
-set -eu
+#!/usr/bin/python3
+import argparse
+import os.path as path
+import re
+import shutil
+import subprocess
+import sys
 
-if [ $# -ne 1 ]; then
-    echo "Usage: run SOURCE_FILE" >&2
-    exit 2
-fi
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename", metavar="SOURCE_FILE")
+    args = parser.parse_args()
+    run(args.filename)
 
-if which clang++-10 >/dev/null 2>&1; then
-    CXX=clang++-10
-elif which clang++ >/dev/null 2>&1; then
-    CXX=clang++
-else
-    CXX=g++
-fi
+def run(filename):
+    compile_source_code(filename)
+    run_binary(filename)
 
-FLAGS="
--std=c++17
--Wall
--Wextra
--Werror
--fsanitize=address
--fsanitize=undefined
--O2
--g
-"
+def compile_source_code(filename):
+    cxx = detect_compiler()
+    flags = [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address",
+        "-fsanitize=undefined",
+        "-O2",
+        "-g",
+    ]
+    res = subprocess.run([cxx] + flags + [filename])
+    if res.returncode != 0:
+        sys.exit(1)
+    print("{} \033[30;42;1m{}\033[m".format("Compile:", " OK! "), flush=True)
 
-"$CXX" $FLAGS "$1"
-printf "%s \e[30;42;1m%s\e[m\n" "Compile:" " OK! "
-./a.out
+def run_binary(filename):
+    input_filename = path.splitext(filename)[0] + ".in"
+    if path.exists(input_filename):
+        run_binary_with_input(input_filename)
+    else:
+        run_binary_without_input()
+
+def run_binary_with_input(input_filename):
+    with open(input_filename) as f:
+        separator = re.compile(r"^----$", re.MULTILINE)
+        inputs = separator.split(f.read())
+    for no, i in enumerate(inputs):
+        print("\n\033[30;47;1m{}\033[m".format(" Case #{}: ".format(no + 1)), flush=True)
+        res = subprocess.run(["./a.out"], input=i.encode())
+        if res.returncode != 0:
+            sys.exit(1)
+
+def run_binary_without_input():
+    res = subprocess.run(["./a.out"])
+    if res.returncode != 0:
+        sys.exit(1)
+
+def detect_compiler():
+    candidates = ["clang++-10", "clang++", "g++"]
+    for candidate in candidates:
+        if shutil.which(candidate) is not None:
+            return candidate
+    print("No C++ compilers are available.", file=sys.stderr, flush=True)
+    sys.exit(1)
+
+if __name__ == "__main__":
+    main()
