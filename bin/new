@@ -1,0 +1,37 @@
+#!/usr/bin/python3
+import argparse
+import os.path as path
+import shutil
+import subprocess
+import sys
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("problem", metavar="PROBLEM")
+    args = parser.parse_args()
+
+    top_dir = path.dirname(path.dirname(path.abspath(__file__)))
+
+    new_cpp_file(args.problem, top_dir)
+    download_input(args.problem)
+
+def new_cpp_file(problem, top_dir):
+    filename = problem.upper() + ".cpp"
+    if path.exists(filename):
+        print("{} already exists.".format(filename), file=sys.stderr, flush=True)
+        return
+
+    shutil.copyfile(path.join(top_dir, "template.hpp"), filename)
+
+def download_input(problem):
+    filename = problem.upper() + ".in"
+    if path.exists(filename):
+        print("{} already exists.".format(filename), file=sys.stderr, flush=True)
+        return
+
+    res = subprocess.run(["download-input", problem.upper()])
+    if res.returncode != 0:
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()
