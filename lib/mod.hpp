@@ -1,7 +1,7 @@
 #include <algorithm>
 using namespace std;
 
-static constexpr int64_t MOD = 1'000'000'007;
+static constexpr int64_t MOD = 1000000007;
 
 inline int64_t add_mod(int64_t a, int64_t b) { return (a + b) % MOD; }
 inline int64_t sub_mod(int64_t a, int64_t b) { return (a - b + MOD) % MOD; }
