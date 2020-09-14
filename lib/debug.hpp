@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <set>
+#include <map>
 #include <optional>
 
 namespace std {
@@ -22,6 +24,38 @@ namespace std {
             os << x;
         }
         os << "]";
+        return os;
+    }
+
+    template <typename K, typename V>
+    ostream& operator<<(ostream& os, const map<K, V>& m) {
+        os << "{";
+        bool first = true;
+        for (const auto& [k, v] : m) {
+            if (first) {
+                first = false;
+            } else {
+                os << ", ";
+            }
+            os << k << ": " << v;
+        }
+        os << "}";
+        return os;
+    }
+
+    template <typename T>
+    ostream& operator<<(ostream& os, const set<T>& s) {
+        os << "{";
+        bool first = true;
+        for (const auto& x : s) {
+            if (first) {
+                first = false;
+            } else {
+                os << ", ";
+            }
+            os << x;
+        }
+        os << "}";
         return os;
     }
 
