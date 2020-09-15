@@ -8,15 +8,15 @@ import sys
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("filename", metavar="SOURCE_FILE")
+    parser.add_argument("problem", metavar="PROBLEM")
     args = parser.parse_args()
-    run(args.filename)
+    run(args.problem)
 
-def run(filename):
-    compile_source_code(filename)
-    run_binary(filename)
+def run(problem):
+    compile_source_code(problem)
+    run_binary(problem)
 
-def compile_source_code(filename):
+def compile_source_code(problem):
     cxx = detect_compiler()
     flags = [
         "-std=c++17",
@@ -28,13 +28,13 @@ def compile_source_code(filename):
         "-O2",
         "-g",
     ]
-    res = subprocess.run([cxx] + flags + [filename])
+    res = subprocess.run([cxx] + flags + [problem.upper() + ".cpp"])
     if res.returncode != 0:
         sys.exit(1)
     print("{} \033[30;42;1m{}\033[m".format("Compile:", " OK! "), flush=True)
 
-def run_binary(filename):
-    input_filename = path.splitext(filename)[0] + ".in"
+def run_binary(problem):
+    input_filename = problem.upper() + ".in"
     if path.exists(input_filename):
         run_binary_with_input(input_filename)
     else:
