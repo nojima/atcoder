@@ -65,3 +65,13 @@ istream& operator>>(istream& is, ModInt& rhs) {
 constexpr ModInt operator""_m(unsigned long long value) noexcept {
     return ModInt((int)value);
 }
+
+ModInt pow_mod(ModInt n, int64_t p) {
+    ModInt ans = 1_m;
+    while (p > 0) {
+        if (p & 1) ans *= n;
+        n *= n;
+        p >>= 1;
+    }
+    return ans;
+}
