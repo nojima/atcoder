@@ -66,12 +66,13 @@ constexpr ModInt operator""_m(unsigned long long value) noexcept {
     return ModInt((int)value);
 }
 
-ModInt pow_mod(ModInt n, int64_t p) {
+// a^n を返す。
+ModInt pow_mod(ModInt a, int64_t n) {
     ModInt ans = 1_m;
-    while (p > 0) {
-        if (p & 1) ans *= n;
-        n *= n;
-        p >>= 1;
+    while (n > 0) {
+        if (n & 1) ans *= a;
+        a *= a;
+        n >>= 1;
     }
     return ans;
 }
