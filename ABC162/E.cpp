@@ -57,7 +57,7 @@ struct ModInt : private boost::operators<ModInt> {
         return value == rhs.value;
     }
 };
-ostream& operator<<(ostream& os, ModInt& rhs) {
+ostream& operator<<(ostream& os, const ModInt& rhs) {
     os << rhs.value;
     return os;
 }
