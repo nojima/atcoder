@@ -62,7 +62,7 @@ istream& operator>>(istream& is, ModInt& rhs) {
     rhs.value = mod(i, MOD);
     return is;
 }
-constexpr ModInt operator""_m(unsigned long long value) noexcept {
+constexpr inline ModInt operator""_m(unsigned long long value) noexcept {
     return ModInt((int)value);
 }
 

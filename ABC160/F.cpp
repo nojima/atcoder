@@ -50,14 +50,14 @@ struct ModInt : private boost::operators<ModInt> {
         value = ((int64_t)value * inverse(rhs.value)) % MOD;
         return *this;
     }
-    constexpr bool operator<(const ModInt& rhs) noexcept {
+    constexpr bool operator<(const ModInt& rhs) const noexcept {
         return value < rhs.value;
     }
-    constexpr bool operator==(const ModInt& rhs) noexcept {
+    constexpr bool operator==(const ModInt& rhs) const noexcept {
         return value == rhs.value;
     }
 };
-ostream& operator<<(ostream& os, ModInt& rhs) {
+ostream& operator<<(ostream& os, const ModInt& rhs) {
     os << rhs.value;
     return os;
 }
@@ -66,7 +66,7 @@ istream& operator>>(istream& is, ModInt& rhs) {
     rhs.value = mod(i, MOD);
     return is;
 }
-constexpr ModInt operator""_m(unsigned long long value) noexcept {
+constexpr inline ModInt operator""_m(unsigned long long value) noexcept {
     return ModInt((int)value);
 }
 
