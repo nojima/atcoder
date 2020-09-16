@@ -46,10 +46,10 @@ struct ModInt : private boost::operators<ModInt> {
         value = ((int64_t)value * inverse(rhs.value)) % MOD;
         return *this;
     }
-    constexpr bool operator<(const ModInt& rhs) noexcept {
+    constexpr bool operator<(const ModInt& rhs) const noexcept {
         return value < rhs.value;
     }
-    constexpr bool operator==(const ModInt& rhs) noexcept {
+    constexpr bool operator==(const ModInt& rhs) const noexcept {
         return value == rhs.value;
     }
 };
