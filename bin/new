@@ -14,6 +14,7 @@ def main():
 
     new_cpp_file(args.problem, top_dir)
     download_input(args.problem)
+    open_cpp_in_vscode(args.problem)
 
 def new_cpp_file(problem, top_dir):
     filename = problem.upper() + ".cpp"
@@ -30,6 +31,12 @@ def download_input(problem):
         return
 
     res = subprocess.run(["download-input", problem.upper()])
+    if res.returncode != 0:
+        sys.exit(1)
+
+def open_cpp_in_vscode(problem):
+    filename = problem.upper() + ".cpp"
+    res = subprocess.run(["code", filename])
     if res.returncode != 0:
         sys.exit(1)
 
