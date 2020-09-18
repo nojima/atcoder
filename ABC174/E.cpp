@@ -31,9 +31,6 @@ int main() {
     int64_t S = 0;
     REP(i, N) S += A[i];
 
-    int64_t b = bin_search(0, 100, [](int64_t) { return true; });
-    cout << b << endl;
-
     int64_t ans = bin_search(0, S+1, [&](int64_t L) {
         // 最大の丸太の長さが L 以下になるように切ることができるか
         int64_t k = 0;
