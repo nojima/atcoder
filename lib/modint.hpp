@@ -1,21 +1,22 @@
 #include <algorithm>
 #include <iostream>
-#include <boost/operators.hpp>
 using namespace std;
 
+#include <boost/operators.hpp>
+
 constexpr int MOD = 1000000007;
+
+// a を m で割った余り(>=0)を返す。
+constexpr inline int mod(int a, int m) noexcept {
+    int r = a % m;
+    return r < 0 ? r + m : r;
+}
 
 // ax + by = gcd(a, b) を満たすような整数 x,y を返す。
 pair<int64_t, int64_t> exgcd(int a, int b) noexcept {
     if (b == 0) return {1, 0};
     auto [x, y] = exgcd(b, a%b);
     return {y, x-(a/b)*y};
-}
-
-// a を m で割った余り(>=0)を返す。
-constexpr inline int mod(int a, int m) noexcept {
-    int r = a % m;
-    return r < 0 ? r + m : r;
 }
 
 // a の逆元を返す。a は MOD と互いに素でなければならない。
