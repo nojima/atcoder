@@ -63,13 +63,13 @@ private:
     }
 
     void force(int index) {
-        if (delayed[index] == 0) return;
+        if (delayed[index] == Num(0)) return;
         if (index < n-1) {
             data[index*2+1] += delayed[index];
             data[index*2+2] += delayed[index];
             delayed[index*2+1] += delayed[index];
             delayed[index*2+2] += delayed[index];
         }
-        delayed[index] = 0;
+        delayed[index] = Num(0);
     }
 };
