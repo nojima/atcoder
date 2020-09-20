@@ -1,62 +1,3 @@
-#include <algorithm>
-#include <iostream>
-#include <vector>
-#include <optional>
-#include <boost/operators.hpp>
-using namespace std;
-
-constexpr int MOD = 998244353;
-
-// a を m で割った余り(>=0)を返す。
-constexpr inline int mod(int a, int m) noexcept {
-    int r = a % m;
-    return r < 0 ? r + m : r;
-}
-
-struct ModInt : private boost::operators<ModInt> {
-    int value;
-    constexpr ModInt() noexcept : value(0) {}
-    constexpr explicit ModInt(int value) noexcept
-        : value(mod(value, MOD)) {}
-    constexpr ModInt& operator+=(const ModInt& rhs) noexcept {
-        value += rhs.value;
-        if (value > MOD) value -= MOD;
-        return *this;
-    }
-    constexpr ModInt& operator-=(const ModInt& rhs) noexcept {
-        value -= rhs.value;
-        if (value < 0) value += MOD;
-        return *this;
-    }
-    constexpr ModInt& operator*=(const ModInt& rhs) noexcept {
-        value = ((int64_t)value * rhs.value) % MOD;
-        return *this;
-    }
-    constexpr bool operator<(const ModInt& rhs) const noexcept {
-        return value < rhs.value;
-    }
-    constexpr bool operator==(const ModInt& rhs) const noexcept {
-        return value == rhs.value;
-    }
-};
-ostream& operator<<(ostream& os, const ModInt& rhs) {
-    os << rhs.value;
-    return os;
-}
-istream& operator>>(istream& is, ModInt& rhs) {
-    int i; is >> i;
-    rhs.value = mod(i, MOD);
-    return is;
-}
-constexpr inline ModInt operator""_m(unsigned long long value) noexcept {
-    return ModInt((int)value);
-}
-
-#define REP(i, n) for (int i = 0; i < (int)(n); ++i)
-#define ALL(c) (c).begin(), (c).end()
-
-//-----------------------------------------------------------------------------
-
 int bit_ceil(int n) {
     int ret = 1;
     while (ret < n) ret *= 2;
@@ -67,7 +8,7 @@ template<class T, class ProductFunc, class UpdateFunc>
 struct LazySegmentTree {
     LazySegmentTree(
         int size,
-        const T& identity,
+        const T& identity,          // product(identity, x) = product(x, identity) = x
         const ProductFunc& product, // (T, T) -> T
         const UpdateFunc& update    // (T, T) -> T
     ): n(bit_ceil(size)), identity(identity), product(product), update(update),
@@ -82,8 +23,6 @@ struct LazySegmentTree {
     T range_query(int lo, int hi) {
         return range_query_(lo, hi, 0, 0, n);
     }
-
-    T query(int i) { return range_query(i, i+1); }
 
 private:
     void range_update_(int lo, int hi, const T& value, int index, int left, int right) {
@@ -143,25 +82,3 @@ private:
     vector<T> data;
     vector<optional<T>> delayed;
 };
-
-//-----------------------------------------------------------------------------
-
-int main() {
-    int N, K; cin >> N >> K;
-    vector<int> L(K), R(K);
-    REP(i, K) cin >> L[i] >> R[i];
-
-    LazySegmentTree dp(
-        N, 0_m,
-        [](ModInt a, ModInt b) { return a + b; },
-        [](ModInt a, ModInt b) { return a + b; }
-    );
-    dp.range_update(0, 1, 1_m);
-    REP(i, N) {
-        auto v = dp.query(i);
-        REP(k, K) {
-            dp.range_update(min(L[k] + i, N), min(R[k] + i + 1, N), v);
-        }
-    }
-    cout << dp.query(N-1) << '\n';
-}
