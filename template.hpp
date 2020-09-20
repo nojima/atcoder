@@ -21,5 +21,7 @@ using namespace std;
 #define FOR(i, a, b) for (int i = (int)(a); i < (int)(b); ++i)
 #define ALL(c) (c).begin(), (c).end()
 
+//-----------------------------------------------------------------------------
+
 int main() {
 }
