@@ -1,0 +1,61 @@
+#!/usr/bin/python3
+import argparse
+import os.path as path
+import re
+import shutil
+import subprocess
+import sys
+
+RE_LOCAL_INCLUDE = re.compile(r'^\s*\#\s*include\s*\"([^"]*)\"\s*$')
+RE_PRAGMA_ONCE = re.compile(r'^\s*\#\s*pragma\s+once\s*$')
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("problem", metavar="PROBLEM")
+    parser.add_argument("--stdout", action="store_true")
+    args = parser.parse_args()
+
+    filename = path.abspath(args.problem.upper() + ".cpp")
+    packed = pack(filename, set())
+    if args.stdout:
+        print(packed)
+    else:
+        copy_to_clipboard(args.problem, packed)
+
+def pack(filename, included):
+    if filename in included:
+        return ""
+    included.add(filename)
+
+    ret = ""
+    with open(filename) as f:
+        for line in f:
+            m = RE_LOCAL_INCLUDE.match(line)
+            if m:
+                include_path = m.group(1)
+                include_path = path.abspath(path.join(path.dirname(filename), include_path))
+                ret += pack(include_path, included)
+                continue
+            m = RE_PRAGMA_ONCE.match(line)
+            if m:
+                continue
+            ret += line
+    return ret
+
+def copy_to_clipboard(problem, packed):
+    ret = subprocess.run([detect_clipboard_command()], input=packed.encode("utf-8"))
+    if ret.returncode != 0:
+        sys.exit(1)
+    print("Copied to the clipboard: problem=" + problem.upper(), file=sys.stderr, flush=True)
+
+
+def detect_clipboard_command():
+    candidates = ["clip.exe", "pbcopy"]
+    for candidate in candidates:
+        if shutil.which(candidate) is not None:
+            return candidate
+    print("No clipboard command are available.", file=sys.stderr, flush=True)
+    sys.exit(1)
+
+if __name__ == '__main__':
+    main()

@@ -1,7 +1,5 @@
-#include <algorithm>
-#include <iostream>
-using namespace std;
-
+#pragma once
+#include "std.hpp"
 #include <boost/operators.hpp>
 
 constexpr int MOD = 1000000007;

@@ -1,12 +1,9 @@
-#include <vector>
-#include <algorithm>
-#include <limits>
+#pragma once
+#include "../std.hpp"
 
 int bit_ceil(int n) {
     int ret = 1;
-    while (ret < n) {
-        ret *= 2;
-    }
+    while (ret < n) ret *= 2;
     return ret;
 }
 

@@ -1,5 +1,5 @@
-#include <algorithm>
-using namespace std;
+#pragma once
+#include "std.hpp"
 
 constexpr int64_t MOD = 1000000007;
 

@@ -1,9 +1,10 @@
+#pragma once
+#include "std.hpp"
+
 struct UnionFind {
     vector<int> data;
-
-    explicit UnionFind(int size) : data(size, -1) {}
-
-    bool merge(int x, int y) {
+    explicit UnionFind(int size): data(size, -1) {}
+    bool merge(int x, int y) noexcept {
         x = root(x);
         y = root(y);
         if (x != y) {
@@ -14,16 +15,13 @@ struct UnionFind {
         }
         return x != y;
     }
-
-    bool find(int x, int y) {
+    bool find(int x, int y) noexcept {
         return root(x) == root(y);
     }
-
-    int root(int x) {
+    int root(int x) noexcept {
         return data[x] < 0 ? x : data[x] = root(data[x]);
     }
-
-    int size(int x) {
+    int size(int x) noexcept {
         return -data[root(x)];
     }
 };

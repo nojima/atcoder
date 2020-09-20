@@ -1,3 +1,6 @@
+#pragma once
+#include "std.hpp"
+
 // 区間[a, b)の中で最初に pred(x) = true となるような x を返す。
 // そのような x が存在しないときは b を返す。
 template <class Pred>

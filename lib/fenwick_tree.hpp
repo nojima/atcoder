@@ -1,3 +1,6 @@
+#pragma once
+#include "std.hpp"
+
 template <typename Int>
 struct FenwickTree {
     vector<Int> data;

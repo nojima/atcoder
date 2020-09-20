@@ -1,3 +1,6 @@
+#pragma once
+#include "std.hpp"
+
 template <typename Traits>
 auto monoid_pow(typename Traits::Monoid base, int exponent)
 {

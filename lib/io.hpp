@@ -1,10 +1,5 @@
-#include <cctype>
-#include <cstdio>
-#include <cstdint>
-#include <string>
-using namespace std;
-
-#pragma region io.hpp
+#pragma once
+#include "std.hpp"
 
 int64_t read_int() {
     int64_t ret = 0, sgn = 1;
@@ -32,5 +27,3 @@ string read_word() {
     ungetc(ch, stdin);
     return ret;
 }
-
-#pragma endregion io.hpp

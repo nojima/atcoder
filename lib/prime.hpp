@@ -1,5 +1,8 @@
+#pragma once
+#include "std.hpp"
+
 // hi以下の素数を小さい順に返す
-// O(hi^1.5)
+// O(hi log(hi))
 vector<int> primes_under(int hi) {
     vector<int> primes;
     primes.push_back(2);
