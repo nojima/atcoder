@@ -8,3 +8,5 @@
 
 template <typename T> inline void assign_min(T& x, const T& value) noexcept { x = min(x, value); }
 template <typename T> inline void assign_max(T& x, const T& value) noexcept { x = max(x, value); }
+
+constexpr char LF = '\n';
