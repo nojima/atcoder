@@ -1,4 +1,5 @@
 #include "../lib/prelude.hpp"
+#include "../lib/io/char.hpp"
 
 int main() {
     int N = read_int();
