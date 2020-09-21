@@ -1,4 +1,4 @@
-#include "../lib/prelude.hpp"
+#include "lib/prelude.hpp"
 
 int main() {
     auto N = read_int();

@@ -1,6 +1,7 @@
 a.out
 a.out.*
 *.gch
+*.pch
 A
 B
 C
