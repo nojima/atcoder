@@ -18,11 +18,11 @@ int main() {
         // 机Aの本を a 冊読むとする
         auto time_a = sum_of(cumsum_a, 0, a);
         if (time_a > K) break;
-        auto max_b = bin_search(1, M+1, [&](int b) {
+        auto max_b = find_maximum_solution(0, M, [&](int b) {
             auto time_b = sum_of(cumsum_b, 0, b);
-            return (time_a + time_b) > K;
+            return (time_a + time_b) <= K;
         });
-        assign_max(ans, a + max_b - 1);
+        assign_max(ans, a + max_b);
     }
     cout << ans << LF;
 }
