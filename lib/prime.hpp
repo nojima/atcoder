@@ -3,10 +3,10 @@
 
 // hi以下の素数を小さい順に返す
 // O(hi log(hi))
-vector<int> primes_under(int hi) {
-    vector<int> primes;
+vector<int64_t> primes_under(int64_t hi) {
+    vector<int64_t> primes;
     primes.push_back(2);
-    for (int i = 3; i <= hi; i += 2) {
+    for (int64_t i = 3; i <= hi; i += 2) {
         bool ok = true;
         for (auto p : primes) {
             if (p*p > hi) { break; }
@@ -38,8 +38,8 @@ vector<bool> sieve(int n) {
 // nを素因数分解する
 // 事前条件: primes は sqrt(n) 以下の素数をすべて含んでいなければならない
 // O(sqrt(n))
-vector<pair<int, int>> prime_factorization(const vector<int>& primes, int n) {
-    vector<pair<int, int>> factors;
+vector<pair<int64_t, int64_t>> prime_factorization(const vector<int64_t>& primes, int64_t n) {
+    vector<pair<int64_t, int64_t>> factors;
     for (auto p : primes) {
         if (p*p > n) { break; }
         int cnt = 0;
