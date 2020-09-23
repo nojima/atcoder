@@ -2,8 +2,6 @@
 #include "std.hpp"
 #include <boost/operators.hpp>
 
-constexpr int MOD = 1000000007;
-
 // a を m で割った余り(>=0)を返す。
 constexpr inline int mod(int a, int m) noexcept {
     int r = a % m;
@@ -11,63 +9,66 @@ constexpr inline int mod(int a, int m) noexcept {
 }
 
 // ax + by = gcd(a, b) を満たすような整数 x,y を返す。
+template<int MOD>
 pair<int64_t, int64_t> exgcd(int a, int b) noexcept {
     if (b == 0) return {1, 0};
-    auto [x, y] = exgcd(b, a%b);
+    auto [x, y] = exgcd<MOD>(b, a%b);
     return {y, x-(a/b)*y};
 }
 
 // a の逆元を返す。a は MOD と互いに素でなければならない。
+template<int MOD>
 inline int inverse(int a) noexcept {
-    return mod(exgcd(MOD, a).second, MOD);
+    return mod(exgcd<MOD>(MOD, a).second, MOD);
 }
 
-struct ModInt : private boost::operators<ModInt> {
+template<int MOD>
+struct ModInt : private boost::operators<ModInt<MOD>> {
     int value;
     constexpr ModInt() noexcept : value(0) {}
     constexpr explicit ModInt(int value) noexcept
         : value(mod(value, MOD)) {}
-    constexpr ModInt& operator+=(const ModInt& rhs) noexcept {
+    constexpr ModInt<MOD>& operator+=(const ModInt<MOD>& rhs) noexcept {
         value += rhs.value;
         if (value > MOD) value -= MOD;
         return *this;
     }
-    constexpr ModInt& operator-=(const ModInt& rhs) noexcept {
+    constexpr ModInt<MOD>& operator-=(const ModInt<MOD>& rhs) noexcept {
         value -= rhs.value;
         if (value < 0) value += MOD;
         return *this;
     }
-    constexpr ModInt& operator*=(const ModInt& rhs) noexcept {
+    constexpr ModInt<MOD>& operator*=(const ModInt<MOD>& rhs) noexcept {
         value = ((int64_t)value * rhs.value) % MOD;
         return *this;
     }
-    ModInt& operator/=(const ModInt& rhs) noexcept {
-        value = ((int64_t)value * inverse(rhs.value)) % MOD;
+    ModInt<MOD>& operator/=(const ModInt<MOD>& rhs) noexcept {
+        value = ((int64_t)value * inverse<MOD>(rhs.value)) % MOD;
         return *this;
     }
-    constexpr bool operator<(const ModInt& rhs) const noexcept {
+    constexpr bool operator<(const ModInt<MOD>& rhs) const noexcept {
         return value < rhs.value;
     }
-    constexpr bool operator==(const ModInt& rhs) const noexcept {
+    constexpr bool operator==(const ModInt<MOD>& rhs) const noexcept {
         return value == rhs.value;
     }
 };
-ostream& operator<<(ostream& os, const ModInt& rhs) {
+template<int MOD>
+ostream& operator<<(ostream& os, const ModInt<MOD>& rhs) {
     os << rhs.value;
     return os;
 }
-istream& operator>>(istream& is, ModInt& rhs) {
+template<int MOD>
+istream& operator>>(istream& is, ModInt<MOD>& rhs) {
     int i; is >> i;
     rhs.value = mod(i, MOD);
     return is;
 }
-constexpr inline ModInt operator""_m(unsigned long long value) noexcept {
-    return ModInt((int)value);
-}
 
 // a^n を返す。
-ModInt pow_mod(ModInt a, int64_t n) {
-    ModInt ans = 1_m;
+template<int MOD>
+ModInt<MOD> pow_mod(ModInt<MOD> a, int64_t n) {
+    auto ans = ModInt<MOD>(1);
     while (n > 0) {
         if (n & 1) ans *= a;
         a *= a;
