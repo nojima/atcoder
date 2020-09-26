@@ -49,6 +49,7 @@ def compile_source_code(filename, top_dir, additional_options):
         "-fsanitize=address",
         "-fsanitize=undefined",
         "--include-directory", top_dir,
+        "--include-directory", path.join(top_dir, "ac-library"),
     ] + additional_options
     cmd = [cxx] + flags + [filename]
     print(" ".join(cmd), flush=True)

@@ -2,6 +2,7 @@ a.out
 a.out.*
 *.gch
 *.pch
+ac-library/
 A
 B
 C
@@ -16,3 +17,15 @@ K
 L
 M
 N
+O
+P
+Q
+R
+S
+T
+U
+V
+W
+X
+Y
+Z
