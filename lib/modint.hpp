@@ -26,8 +26,7 @@ template<int MOD>
 struct ModInt : private boost::operators<ModInt<MOD>> {
     int value;
     constexpr ModInt() noexcept : value(0) {}
-    constexpr explicit ModInt(int value) noexcept
-        : value(mod(value, MOD)) {}
+    constexpr ModInt(int value) noexcept : value(mod(value, MOD)) {}
     constexpr ModInt<MOD>& operator+=(const ModInt<MOD>& rhs) noexcept {
         value += rhs.value;
         if (value > MOD) value -= MOD;
@@ -43,14 +42,26 @@ struct ModInt : private boost::operators<ModInt<MOD>> {
         return *this;
     }
     ModInt<MOD>& operator/=(const ModInt<MOD>& rhs) noexcept {
-        value = ((int64_t)value * inverse<MOD>(rhs.value)) % MOD;
-        return *this;
+        return *this *= rhs.inverse();
     }
     constexpr bool operator<(const ModInt<MOD>& rhs) const noexcept {
         return value < rhs.value;
     }
     constexpr bool operator==(const ModInt<MOD>& rhs) const noexcept {
         return value == rhs.value;
+    }
+    ModInt<MOD> pow(int64_t n) const noexcept {
+        auto a = *this;
+        auto ans = ModInt<MOD>(1);
+        while (n > 0) {
+            if (n & 1) ans *= a;
+            a *= a;
+            n >>= 1;
+        }
+        return ans;
+    }
+    ModInt<MOD> inverse() const noexcept {
+        return ModInt<MOD>(::inverse<MOD>(value));
     }
 };
 template<int MOD>
@@ -63,16 +74,4 @@ istream& operator>>(istream& is, ModInt<MOD>& rhs) {
     int i; is >> i;
     rhs.value = mod(i, MOD);
     return is;
-}
-
-// a^n を返す。
-template<int MOD>
-ModInt<MOD> pow_mod(ModInt<MOD> a, int64_t n) {
-    auto ans = ModInt<MOD>(1);
-    while (n > 0) {
-        if (n & 1) ans *= a;
-        a *= a;
-        n >>= 1;
-    }
-    return ans;
 }
