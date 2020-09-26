@@ -1,5 +1,5 @@
 #pragma once
-#include "std.hpp"
+#include "../std.hpp"
 
 int bit_ceil(int n) {
     int ret = 1;
