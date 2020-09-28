@@ -1,11 +1,6 @@
 #pragma once
 #include "../std.hpp"
-
-int bit_ceil(int n) {
-    int ret = 1;
-    while (ret < n) ret *= 2;
-    return ret;
-}
+#include "../bit.hpp"
 
 template<class T, class ProductFunc, class UpdateFunc>
 struct LazySegmentTree {
