@@ -1,6 +1,6 @@
 #pragma once
-#include "../std.hpp"
-#include "../bit.hpp"
+#include "std.hpp"
+#include "bit.hpp"
 
 template<class T, class ProductFunc, class UpdateFunc>
 struct LazySegmentTree {
