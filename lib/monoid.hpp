@@ -1,137 +1,58 @@
 #pragma once
 #include "std.hpp"
 
-template <typename Traits>
-auto monoid_pow(typename Traits::Monoid base, int exponent)
-{
-    using Monoid = typename Traits::Monoid;
+template<class T> struct Monoid;
 
-    Monoid ans = Traits::identity();
+template<class T>
+auto monoid_pow(T base, int64_t exponent) {
+    using M = Monoid<T>;
+    T ans = M::identity();
     while (exponent > 0) {
         if (exponent & 1) {
-            ans = Traits::op(ans, base);
+            ans = M::op(ans, base);
         }
-        base = Traits::op(base, base);
+        base = M::op(base, base);
         exponent >>= 1;
     }
     return ans;
 }
 
-template <typename Traits>
-auto monoid_concat(const vector<typename Traits::Monoid>& xs)
-{
-    using Monoid = typename Traits::Monoid;
-
-    Monoid acc = Traits::identity();
-    for (const auto& x : xs) {
-        acc = Traits::op(acc, x);
-    }
-    return acc;
-}
-
-template <typename Traits>
-auto cumulative(const vector<typename Traits::Monoid>& xs)
-{
-    using Monoid = typename Traits::Monoid;
-
-    vector<Monoid> result;
-    Monoid acc = Traits::identity();
-    for (const auto& x : xs) {
-        acc = Traits::op(acc, x);
-        result.push_back(acc);
-    }
-    return result;
-}
-
 //-----------------------------------------------------------------------------
 // モノイドの例
 
-// 加算によるモノイド
-struct SumMonoid {
-    using Monoid = long long;
-
-    static constexpr Monoid identity() {
-        return 0;
-    }
-
-    static Monoid op(Monoid lhs, Monoid rhs) {
-        return lhs + rhs;
-    }
-};
-
 // 乗法によるモノイド
-struct ProductMonoid {
-    using Monoid = long long;
-
-    static constexpr Monoid identity() {
-        return 1;
-    }
-
-    static Monoid op(Monoid lhs, Monoid rhs) {
-        return lhs * rhs;
-    }
-};
-
-// MOD を法とする乗法によるモノイド
-struct ModuloProductMonoid {
-    using Monoid = long long;
-
-    static constexpr Monoid identity() {
-        return 1;
-    }
-
-    static Monoid op(Monoid lhs, Monoid rhs) {
-        static const Monoid MOD = 1000000007;
-        return (lhs * rhs) % MOD;
-    }
+template<>
+struct Monoid<int64_t> {
+    static constexpr inline int64_t identity() noexcept { return 1; }
+    static constexpr inline int64_t op(int64_t lhs, int64_t rhs) noexcept { return lhs * rhs; }
 };
 
 // 文字列モノイド
-struct StringMonoid {
-    using Monoid = string;
-
-    static Monoid identity() {
-        return "";
-    }
-
-    static Monoid op(const Monoid& lhs, const Monoid& rhs) {
-        return lhs + rhs;
-    }
+template<>
+struct Monoid<string> {
+    static inline string identity() { return ""; }
+    static inline string op(const string& lhs, const string& rhs) { return lhs + rhs; }
 };
 
 // TとUがそれぞれモノイドであるならば、pair<T, U> もモノイド
-template <typename TraitsT, typename TraitsU>
-struct PairMonoid {
-    using Monoid = pair<typename TraitsT::Monoid, typename TraitsU::Monoid>;
-
-    static constexpr Monoid identity() {
-        return {
-            TraitsT::identity(),
-            TraitsU::identity(),
-        };
+template<typename T, typename U>
+struct Monoid<pair<T, U>> {
+    static inline pair<T, U> identity() {
+        return { Monoid<T>::identity(), Monoid<U>::identity(), };
     }
-
-    static Monoid op(Monoid lhs, Monoid rhs) {
-        return {
-            TraitsT::op(lhs.first, rhs.first),
-            TraitsU::op(lhs.second, rhs.second),
-        };
+    static inline pair<T, U> op(const pair<T, U>& lhs, const pair<T, U>& rhs) {
+        return { Monoid<T>::op(lhs.first, rhs.first), Monoid<U>::op(lhs.second, rhs.second) };
     }
 };
 
 // Tがモノイドであるならば、optional<T> もモノイド
-template <typename TraitsT>
-struct OptionalMonoid {
-    using Monoid = optional<typename TraitsT::Monoid>;
-
-    static constexpr Monoid identity() {
-        return nullopt;
-    }
-
-    static Monoid op(Monoid lhs, Monoid rhs) {
+template<typename T>
+struct Monoid<optional<T>> {
+    static constexpr inline optional<T> identity() noexcept { return nullopt; }
+    static optional<T> op(const optional<T>& lhs, const optional<T>& rhs) {
         if (!lhs && !rhs) { return nullopt; }
         if (!lhs) { return rhs; }
         if (!rhs) { return lhs; }
-        return TraitsT::op(*lhs, *rhs);
+        return Monoid<T>::op(*lhs, *rhs);
     }
 };
