@@ -8,7 +8,7 @@ struct BitSet {
 };
 template<class Func>
 void foreach_power_set(int n, Func f) {
-    for (uint32_t S = 0; S < (unsigned)(1 << n); ++S) {
+    for (uint32_t S = 0; S < (uint32_t)(1 << n); ++S) {
         f(BitSet(S));
     }
 }
