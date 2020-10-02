@@ -19,7 +19,7 @@ int main() {
     }
 
     vector<int> A(N);
-    auto brute_force = fix([&](auto&& self, int i, int min_k) -> int {
+    auto brute_force = Fix([&](auto&& self, int i, int min_k) -> int {
         if (i == N) {
             int score = 0;
             REP(i, Q) {

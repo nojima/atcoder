@@ -13,7 +13,7 @@ int main() {
     }
 
     vector<bool> visited(N);
-    auto dfs = fix([&](auto&& self, int v) -> void {
+    auto dfs = Fix([&](auto&& self, int v) -> void {
         if (visited[v]) return;
         visited[v] = true;
         for(auto dst : graph[v]) {
