@@ -29,7 +29,7 @@ struct ModInt : private boost::operators<ModInt<MOD>> {
     constexpr ModInt(int value) noexcept : value(mod(value, MOD)) {}
     constexpr ModInt<MOD>& operator+=(const ModInt<MOD>& rhs) noexcept {
         value += rhs.value;
-        if (value > MOD) value -= MOD;
+        if (value >= MOD) value -= MOD;
         return *this;
     }
     constexpr ModInt<MOD>& operator-=(const ModInt<MOD>& rhs) noexcept {

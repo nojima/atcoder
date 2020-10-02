@@ -20,6 +20,7 @@ struct Combination {
         }
         return inv_facts[n];
     }
+    Int nPr(int n, int r) { return fact(n) * inv_fact(n-r); }
     Int nCr(int n, int r) { return fact(n) * inv_fact(r) * inv_fact(n-r); }
     Int nHr(int n, int r) { return nCr(n+r-1, r); }
 };
