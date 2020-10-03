@@ -10,6 +10,7 @@ struct PersistentArray {
         return get(i, root, 0, size);
     }
 
+    [[nodiscard]]
     PersistentArray<T> set(int i, int x) const {
         return PersistentArray<T>(set(i, x, root, 0, size), size);
     }
