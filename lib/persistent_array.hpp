@@ -1,40 +1,6 @@
 #pragma once
 #include "std.hpp"
 
-template<class T> union Node;
-
-template<class T>
-struct Leaf {
-    T data;
-};
-
-template<class T>
-struct Branch {
-    Node<T>* left;
-    Node<T>* right;
-};
-
-template<class T>
-union Node {
-    Leaf<T>   leaf;
-    Branch<T> branch;
-};
-
-template<class T>
-Node<T>* new_leaf(const T& data) {
-    auto node = new Node<T>;
-    node->leaf.data = data;
-    return node;
-}
-
-template<class T>
-Node<T>* new_branch(Node<T>* left, Node<T>* right) {
-    auto node = new Node<T>;
-    node->branch.left = left;
-    node->branch.right = right;
-    return node;
-}
-
 template<class T>
 struct PersistentArray {
     PersistentArray(int n, const T& init)
@@ -44,39 +10,52 @@ struct PersistentArray {
         return get(i, root, 0, size);
     }
 
-    PersistentArray<T> set(int i, int x) {
+    PersistentArray<T> set(int i, int x) const {
         return PersistentArray<T>(set(i, x, root, 0, size), size);
     }
 
 private:
-    PersistentArray(Node<T>* root, int size): size(size), root(root) {}
+    struct Leaf {
+        T data;
+        explicit Leaf(const T& data): data(data) {}
+    };
 
-    Node<T>* construct(const T& init, int l, int r) {
-        if (r == l+1) { return new_leaf(init); }
+    struct Branch {
+        void* left;
+        void* right;
+        Branch(void* l, void* r): left(l), right(r) {}
+    };
+
+    PersistentArray(void* root, int size): size(size), root(root) {}
+
+    void* construct(const T& init, int l, int r) {
+        if (r == l+1) { return new Leaf(init); }
         int m = (l + r) / 2;
         auto left  = construct(init, l, m);
         auto right = construct(init, m, r);
-        return new_branch(left, right);
+        return new Branch(left, right);
     }
 
-    T get(int i, const Node<T>* node, int l, int r) const {
-        if (l == i && r == i+1) { return node->leaf.data; }
+    T get(int i, const void* node, int l, int r) const {
+        if (l == i && r == i+1) { return ((const Leaf*)node)->data; }
+        auto branch = (const Branch*)node;
         int m = (l + r) / 2;
-        if (i < m) { return get(i, node->branch.left,  l, m); }
-        else       { return get(i, node->branch.right, m, r); }
+        if (i < m) { return get(i, branch->left,  l, m); }
+        else       { return get(i, branch->right, m, r); }
     }
 
-    Node<T>* set(int i, int x, const Node<T>* node, int l, int r) const {
-        if (l == i && r == i+1) { return new_leaf(x); }
-        auto left  = node->branch.left;
-        auto right = node->branch.right;
+    void* set(int i, int x, const void* node, int l, int r) const {
+        if (l == i && r == i+1) { return new Leaf(x); }
+        auto branch = (const Branch*)node;
+        auto left  = branch->left;
+        auto right = branch->right;
         int m = (l + r) / 2;
-        if (i < m) { left  = set(i, x, node->branch.left,  l, m); }
-        else       { right = set(i, x, node->branch.right, m, r); }
-        return new_branch(left, right);
+        if (i < m) { left  = set(i, x, branch->left,  l, m); }
+        else       { right = set(i, x, branch->right, m, r); }
+        return new Branch(left, right);
     }
 
 private:
     int size;
-    Node<T>* root;
+    void* root;
 };
