@@ -9,16 +9,17 @@ import sys
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("problem", metavar="PROBLEM")
+    parser.add_argument("case_no", metavar="CASE", type=int, nargs='?')
     args = parser.parse_args()
 
     top_dir = path.dirname(path.dirname(path.abspath(__file__)))
 
-    run(args.problem, top_dir)
+    run(args.problem, top_dir, args.case_no)
 
-def run(problem, top_dir):
+def run(problem, top_dir, case_no):
     compile_precompiled_header_file(top_dir)
     compile_cpp_file(problem, top_dir)
-    run_binary(problem)
+    run_binary(problem, case_no)
 
 def compile_precompiled_header_file(top_dir):
     filename = path.join(top_dir, "lib/std.hpp")
@@ -57,18 +58,20 @@ def compile_source_code(filename, top_dir, additional_options):
     if res.returncode != 0:
         sys.exit(1)
 
-def run_binary(problem):
+def run_binary(problem, case_no):
     input_filename = problem.upper() + ".in"
     if path.exists(input_filename):
-        run_binary_with_input(input_filename)
+        run_binary_with_input(input_filename, case_no)
     else:
         run_binary_without_input()
 
-def run_binary_with_input(input_filename):
+def run_binary_with_input(input_filename, case_no):
     with open(input_filename) as f:
         separator = re.compile(r"^----$", re.MULTILINE)
         inputs = separator.split(f.read())
     for no, i in enumerate(inputs):
+        if case_no is not None and case_no != no+1:
+            continue
         print("\n\033[30;47;1m{}\033[m".format(" Case #{} ".format(no + 1)), flush=True)
         res = subprocess.run(["./a.out"], input=i.encode())
         if res.returncode != 0:
