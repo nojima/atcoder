@@ -2,11 +2,10 @@
 #include "std.hpp"
 
 struct UnionFind {
-    vector<int> data;
-    explicit UnionFind(int size): data(size, -1) {}
+    explicit UnionFind(int n): data(n, -1) {}
     bool merge(int x, int y) noexcept {
-        x = root(x);
-        y = root(y);
+        x = leader(x);
+        y = leader(y);
         if (x != y) {
             if (data[y] < data[x])
                 swap(x, y);
@@ -15,13 +14,15 @@ struct UnionFind {
         }
         return x != y;
     }
-    bool find(int x, int y) noexcept {
-        return root(x) == root(y);
+    bool same(int x, int y) noexcept {
+        return leader(x) == leader(y);
     }
-    int root(int x) noexcept {
-        return data[x] < 0 ? x : data[x] = root(data[x]);
+    int leader(int x) noexcept {
+        return data[x] < 0 ? x : data[x] = leader(data[x]);
     }
     int size(int x) noexcept {
-        return -data[root(x)];
+        return -data[leader(x)];
     }
+private:
+    vector<int> data;
 };
