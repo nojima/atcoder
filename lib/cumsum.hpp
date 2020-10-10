@@ -2,8 +2,8 @@
 #include "std.hpp"
 
 template <typename Int>
-vector<int64_t> make_cumsum(const vector<Int>& v) {
-    vector<int64_t> cumsum(v.size()+1);
+vector<Int> make_cumsum(const vector<Int>& v) {
+    vector<Int> cumsum(v.size()+1);
     for (size_t i = 1; i < cumsum.size(); ++i) {
         cumsum[i] = cumsum[i-1] + v[i-1];
     }
@@ -11,6 +11,7 @@ vector<int64_t> make_cumsum(const vector<Int>& v) {
 }
 
 // [first, last) の和を返す
-inline int64_t sum_of(const vector<int64_t>& cumsum, int first, int last) noexcept {
+template <typename Int>
+inline Int sum_of(const vector<Int>& cumsum, int first, int last) noexcept {
     return cumsum[last] - cumsum[first];
 }
