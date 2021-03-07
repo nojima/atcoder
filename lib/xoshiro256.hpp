@@ -26,6 +26,6 @@ public:
     }
 
     using result_type = uint64_t;
-    constexpr inline uint64_t min() noexcept { return 0; }
-    constexpr inline uint64_t max() noexcept { return numeric_limits<uint64_t>::max(); }
+    static constexpr inline uint64_t min() noexcept { return 0; }
+    static constexpr inline uint64_t max() noexcept { return numeric_limits<uint64_t>::max(); }
 };

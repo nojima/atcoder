@@ -11,6 +11,14 @@ vector<vector<int64_t>> S;
 
 Xoshiro256 rng;
 
+inline double random_double() {
+    return (double)rng() * (1.0 / (double)Xoshiro256::max());
+}
+
+inline int64_t random_int64(int64_t n) {
+    return rng() % n;
+}
+
 void read_input() {
     n_days = read_int();
 
@@ -55,36 +63,68 @@ void print_solution(const vector<Contest>& schedule) {
     }
 }
 
-int main() {
-    Stopwatch stopwatch;
+inline double lerp(double x, double y, double alpha) {
+    return x + (y - x) * alpha;
+}
 
-    ios::sync_with_stdio(false);
-
-    read_input();
-
+vector<Contest> simulated_annealing(const Stopwatch& stopwatch, int64_t time_limit_millis) {
     auto schedule = make_initial_solution();
     auto current_score = calculate_score(schedule);
+    vector<Contest> best_schedule;
+    int64_t best_score = numeric_limits<int64_t>::min();
+
+    const double initial_temperature = 1500.0;
+    const double final_temperature = 100.0;
+    double temperature = initial_temperature;
+    double start_time = stopwatch.elapsed_millis();
 
     for(int iteration = 0; ; ++iteration) {
         if(iteration % 1000 == 0) {
-            if(stopwatch.elapsed_millis() > 1800) {
-                DEBUG(cerr << "iteration = " << iteration << endl);
-                break;
+            auto elapsed = stopwatch.elapsed_millis();
+            if(elapsed >= time_limit_millis) {
+                //DEBUG(cerr << "iteration = " << iteration << endl);
+                return best_schedule;
             }
+
+            // 温度を調整
+            double progress = (double)(elapsed - start_time) / (time_limit_millis - start_time);
+            temperature = lerp(initial_temperature, final_temperature, progress);
         }
 
-        auto d = rng() % n_days;
-        auto q = rng() % 26;
+        // 近傍を選ぶ
+        auto d = random_int64(n_days);
+        auto q = random_int64(26);
         auto old = schedule[d];
         schedule[d] = q;
         auto new_score = calculate_score(schedule);
-        if(new_score > current_score) {
-            current_score = new_score;
+
+        // 遷移するか決める
+        bool ok;
+        if(new_score >= current_score) {
+            ok = true;
         } else {
+            int64_t delta = current_score - new_score;
+            double accept_prob = exp(-delta / temperature);
+            ok = random_double() < accept_prob;
+        }
+
+        if(ok) { // 遷移する
+            current_score = new_score;
+            if(current_score > best_score) {
+                best_score = current_score;
+                best_schedule = schedule;
+            }
+        } else { // 遷移しない
             schedule[d] = old;
         }
     }
+}
 
+int main() {
+    Stopwatch stopwatch;
+    ios::sync_with_stdio(false);
+    read_input();
+    auto schedule = simulated_annealing(stopwatch, 1800);
     print_solution(schedule);
     DEBUG(cerr << "score = " << calculate_score(schedule) << endl);
 }
