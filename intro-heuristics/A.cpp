@@ -65,23 +65,35 @@ vector<Contest> simulated_annealing(const Stopwatch& stopwatch, int64_t time_lim
     double start_time = stopwatch.elapsed_millis();
 
     for(int iteration = 0; ; ++iteration) {
-        if(iteration % 1000 == 0) {
+        if(iteration % 100 == 0) {
             auto elapsed = stopwatch.elapsed_millis();
             if(elapsed >= time_limit_millis) {
-                //DEBUG(cerr << "iteration = " << iteration << endl);
+                DEBUG(cerr << "iteration = " << iteration << endl);
                 return best_schedule;
             }
 
             // 温度を調整
             double progress = (double)(elapsed - start_time) / (time_limit_millis - start_time);
             temperature = lerp(initial_temperature, final_temperature, progress);
+            //DEBUG(cerr << "T = " << temperature << '\n';)
         }
 
         // 近傍を選ぶ
-        auto d = rng() % n_days;
-        auto q = rng() % 26;
-        auto old = schedule[d];
-        schedule[d] = q;
+        enum { kSwap, kReplace } action;
+        Contest old;
+        int day;
+        if(rng.next_double() < 0.5) {
+            // 選んだ日のコンテストをランダムに置き換える
+            action = kReplace;
+            day = rng() % n_days;
+            old = schedule[day];
+            schedule[day] = rng() % 26;
+        } else {
+            // 選んだ日のコンテストを次の日と入れ替える
+            action = kSwap;
+            day = rng() % (n_days - 1);
+            swap(schedule[day], schedule[day+1]);
+        }
         auto new_score = calculate_score(schedule);
 
         // 遷移するか決める
@@ -101,7 +113,12 @@ vector<Contest> simulated_annealing(const Stopwatch& stopwatch, int64_t time_lim
                 best_schedule = schedule;
             }
         } else { // 遷移しない
-            schedule[d] = old;
+            // 状態を元に戻す
+            if(action == kReplace) {
+                schedule[day] = old;
+            } else {
+                swap(schedule[day], schedule[day+1]);
+            }
         }
     }
 }
