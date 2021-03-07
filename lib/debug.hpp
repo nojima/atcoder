@@ -63,3 +63,9 @@ ostream& operator<<(ostream& os, const optional<T>& v) {
         os << "nullopt";
     return os;
 }
+
+#ifdef ONLINE_JUDGE
+#define DEBUG(code)
+#else
+#define DEBUG(code) code
+#endif
