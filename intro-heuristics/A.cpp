@@ -11,14 +11,6 @@ vector<vector<int64_t>> S;
 
 Xoshiro256 rng;
 
-inline double random_double() {
-    return (double)rng() * (1.0 / (double)Xoshiro256::max());
-}
-
-inline int64_t random_int64(int64_t n) {
-    return rng() % n;
-}
-
 void read_input() {
     n_days = read_int();
 
@@ -57,12 +49,6 @@ vector<Contest> make_initial_solution() {
     return schedule;
 }
 
-void print_solution(const vector<Contest>& schedule) {
-    REP(d, n_days) {
-        cout << schedule[d]+1 << LF;
-    }
-}
-
 inline double lerp(double x, double y, double alpha) {
     return x + (y - x) * alpha;
 }
@@ -92,8 +78,8 @@ vector<Contest> simulated_annealing(const Stopwatch& stopwatch, int64_t time_lim
         }
 
         // 近傍を選ぶ
-        auto d = random_int64(n_days);
-        auto q = random_int64(26);
+        auto d = rng() % n_days;
+        auto q = rng() % 26;
         auto old = schedule[d];
         schedule[d] = q;
         auto new_score = calculate_score(schedule);
@@ -105,7 +91,7 @@ vector<Contest> simulated_annealing(const Stopwatch& stopwatch, int64_t time_lim
         } else {
             int64_t delta = current_score - new_score;
             double accept_prob = exp(-delta / temperature);
-            ok = random_double() < accept_prob;
+            ok = rng.next_double() < accept_prob;
         }
 
         if(ok) { // 遷移する
@@ -117,6 +103,12 @@ vector<Contest> simulated_annealing(const Stopwatch& stopwatch, int64_t time_lim
         } else { // 遷移しない
             schedule[d] = old;
         }
+    }
+}
+
+void print_solution(const vector<Contest>& schedule) {
+    REP(d, n_days) {
+        cout << schedule[d]+1 << LF;
     }
 }
 

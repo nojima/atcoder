@@ -13,6 +13,7 @@ class Xoshiro256 {
     };
 
 public:
+    // 0以上2^64未満のランダムな整数を返す。
     uint64_t operator()() noexcept {
         const uint64_t result = rotl(s[0] + s[3], 23) + s[0];
         const uint64_t t = s[1] << 17;
@@ -25,6 +26,14 @@ public:
         return result;
     }
 
+    // 0以上1未満のランダムな浮動小数点数を返す。
+    inline double next_double() noexcept {
+        union { uint64_t i; double d; } u;
+        u.i = ((*this)() & 0xfffffffffffffULL) | 0x3ff0000000000000ULL;
+        return u.d - 1.0;
+    }
+
+    // For <random>
     using result_type = uint64_t;
     static constexpr inline uint64_t min() noexcept { return 0; }
     static constexpr inline uint64_t max() noexcept { return numeric_limits<uint64_t>::max(); }

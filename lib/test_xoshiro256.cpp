@@ -8,4 +8,9 @@ int main() {
         auto r = dist(engine);
         cout << r << '\n';
     }
+    cout << "----" << endl;
+    REP(i, 1000) {
+        auto r = engine.next_double();
+        cout << r << '\n';
+    }
 }
