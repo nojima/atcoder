@@ -1,7 +1,6 @@
 #include "lib/prelude.hpp"
 #include "lib/xoshiro256.hpp"
 #include "lib/stopwatch.hpp"
-#include "lib/debug.hpp"
 
 using Contest = int;
 
@@ -10,96 +9,6 @@ vector<int64_t> C;
 vector<vector<int64_t>> S;
 
 Xoshiro256 rng;
-
-void read_input() {
-    n_days = read_int();
-
-    C.resize(26);
-    REP(i, 26) {
-        C[i] = read_int();
-    }
-
-    S.resize(n_days, vector(26, int64_t(0)));
-    REP(i, n_days) REP(j, 26) {
-        S[i][j] = read_int();
-    }
-}
-
-int64_t calculate_score(const vector<Contest>& schedule) {
-    int64_t satisfaction = 0;
-    vector<int> last(26, -1);
-
-    for(int d = 0; d < n_days; ++d) {
-        int t_held = schedule[d];
-        satisfaction += S[d][t_held];
-        last[t_held] = d;
-        for(int t = 0; t < 26; ++t) {
-            satisfaction -= C[t] * (d - last[t]);
-        }
-    }
-
-    return satisfaction;
-}
-
-vector<Contest> make_initial_solution() {
-    vector<Contest> schedule(n_days);
-    REP(d, n_days) {
-        schedule[d] = rng() % 26;
-    }
-    return schedule;
-}
-
-inline double lerp(double x, double y, double alpha) {
-    return x + (y - x) * alpha;
-}
-
-inline int64_t calculate_penalty(int k) {
-    return k * (k+1) / 2;
-}
-
-int64_t calculate_score_delta_on_contest_remove(
-    vector<set<int>>& contest_date_list, int day, Contest contest
-) {
-    auto& l = contest_date_list[contest];
-    auto it = l.find(day);
-    int prev_day = *prev(it);
-    int next_day = *next(it);
-
-    int d1 = next_day - prev_day - 1; // コンテストが開催されなかった日数
-    int d2 = day - prev_day - 1;
-    int d3 = next_day - day - 1;
-
-    int64_t p1 = calculate_penalty(d1);
-    int64_t p2 = calculate_penalty(d2);
-    int64_t p3 = calculate_penalty(d3);
-
-    l.erase(day);
-
-    auto delta = p2 + p3 - p1;
-    return delta * C[contest] - S[day][contest];
-}
-
-int64_t calculate_score_delta_on_contest_add(
-    vector<set<int>>& contest_date_list, int day, Contest contest
-) {
-    auto& l = contest_date_list[contest];
-    auto it = l.lower_bound(day);
-    int next_day = *it;
-    int prev_day = *prev(it);
-
-    int d1 = next_day - prev_day - 1; // コンテストが開催されなかった日数
-    int d2 = day - prev_day - 1;
-    int d3 = next_day - day - 1;
-
-    int64_t p1 = calculate_penalty(d1);
-    int64_t p2 = calculate_penalty(d2);
-    int64_t p3 = calculate_penalty(d3);
-
-    l.insert(day);
-
-    auto delta = p1 - p2 - p3;
-    return delta * C[contest] + S[day][contest];
-}
 
 template <class Func1, class Func2, class Func3>
 void simulated_annealing(
@@ -152,6 +61,92 @@ void simulated_annealing(
             undo_move(undo_info);
         }
     }
+}
+
+void read_input() {
+    n_days = read_int();
+
+    C.resize(26);
+    REP(i, 26) {
+        C[i] = read_int();
+    }
+
+    S.resize(n_days, vector(26, int64_t(0)));
+    REP(i, n_days) REP(j, 26) {
+        S[i][j] = read_int();
+    }
+}
+
+int64_t calculate_score(const vector<Contest>& schedule) {
+    int64_t satisfaction = 0;
+    vector<int> last(26, -1);
+
+    for(int d = 0; d < n_days; ++d) {
+        int t_held = schedule[d];
+        satisfaction += S[d][t_held];
+        last[t_held] = d;
+        for(int t = 0; t < 26; ++t) {
+            satisfaction -= C[t] * (d - last[t]);
+        }
+    }
+
+    return satisfaction;
+}
+
+vector<Contest> make_initial_solution() {
+    vector<Contest> schedule(n_days);
+    REP(d, n_days) {
+        schedule[d] = rng() % 26;
+    }
+    return schedule;
+}
+
+inline int64_t calculate_penalty(int k) {
+    return k * (k+1) / 2;
+}
+
+int64_t calculate_score_delta_on_contest_remove(
+    vector<set<int>>& contest_date_list, int day, Contest contest
+) {
+    auto& l = contest_date_list[contest];
+    auto it = l.find(day);
+    int prev_day = *prev(it);
+    int next_day = *next(it);
+
+    int d1 = next_day - prev_day - 1; // コンテストが開催されなかった日数
+    int d2 = day - prev_day - 1;
+    int d3 = next_day - day - 1;
+
+    int64_t p1 = calculate_penalty(d1);
+    int64_t p2 = calculate_penalty(d2);
+    int64_t p3 = calculate_penalty(d3);
+
+    l.erase(day);
+
+    auto delta = p2 + p3 - p1;
+    return delta * C[contest] - S[day][contest];
+}
+
+int64_t calculate_score_delta_on_contest_add(
+    vector<set<int>>& contest_date_list, int day, Contest contest
+) {
+    auto& l = contest_date_list[contest];
+    auto it = l.lower_bound(day);
+    int next_day = *it;
+    int prev_day = *prev(it);
+
+    int d1 = next_day - prev_day - 1; // コンテストが開催されなかった日数
+    int d2 = day - prev_day - 1;
+    int d3 = next_day - day - 1;
+
+    int64_t p1 = calculate_penalty(d1);
+    int64_t p2 = calculate_penalty(d2);
+    int64_t p3 = calculate_penalty(d3);
+
+    l.insert(day);
+
+    auto delta = p1 - p2 - p3;
+    return delta * C[contest] + S[day][contest];
 }
 
 vector<Contest> solve(int64_t time_limit_millis) {
@@ -255,5 +250,8 @@ int main() {
     read_input();
     auto schedule = solve(1800);
     print_solution(schedule);
-    DEBUG(cerr << "score = " << calculate_score(schedule) << endl);
+
+#ifndef ONLINE_JUDGE
+    cerr << "score = " << calculate_score(schedule) << endl;
+#endif
 }
