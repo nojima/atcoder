@@ -1,7 +1,7 @@
 #include "lib/prelude.hpp"
 #include "lib/xoshiro256.hpp"
+#include "lib/stopwatch.hpp"
 #include "lib/debug.hpp"
-#include <chrono>
 
 using Contest = int;
 
@@ -54,17 +54,6 @@ void print_solution(const vector<Contest>& schedule) {
         cout << schedule[d]+1 << LF;
     }
 }
-
-class Stopwatch {
-    chrono::steady_clock::time_point t0;
-
-public:
-    Stopwatch(): t0(chrono::steady_clock::now()) {}
-    int64_t elapsed_millis() {
-        auto now = chrono::steady_clock::now();
-        return chrono::duration_cast<chrono::milliseconds>(now - t0).count();
-    }
-};
 
 int main() {
     Stopwatch stopwatch;
