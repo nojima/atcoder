@@ -61,7 +61,6 @@ int64_t calculate_score_delta_on_contest_remove(
     vector<set<int>>& contest_date_list, int day, Contest contest
 ) {
     auto& l = contest_date_list[contest];
-    //cerr << "remove: l = " << l << ", contest = " << contest << endl;
     auto it = l.find(day);
     int prev_day = *prev(it);
     int next_day = *next(it);
@@ -77,7 +76,6 @@ int64_t calculate_score_delta_on_contest_remove(
     l.erase(day);
 
     auto delta = p2 + p3 - p1;
-    //cerr << "remove: delta = " << delta << endl;
     return delta * C[contest] - S[day][contest];
 }
 
@@ -85,7 +83,6 @@ int64_t calculate_score_delta_on_contest_add(
     vector<set<int>>& contest_date_list, int day, Contest contest
 ) {
     auto& l = contest_date_list[contest];
-    //cerr << "add: l = " << l << ", contest = " << contest << endl;
     auto it = l.lower_bound(day);
     int next_day = *it;
     int prev_day = *prev(it);
@@ -101,7 +98,6 @@ int64_t calculate_score_delta_on_contest_add(
     l.insert(day);
 
     auto delta = p1 - p2 - p3;
-    //cerr << "add: delta = " << delta << endl;
     return delta * C[contest] + S[day][contest];
 }
 
@@ -112,8 +108,8 @@ vector<Contest> simulated_annealing(const Stopwatch& stopwatch, int64_t time_lim
     vector<Contest> best_schedule;
     int64_t best_score = numeric_limits<int64_t>::min();
 
-    const double initial_temperature = 1500.0;
-    const double final_temperature = 100.0;
+    const double initial_temperature = 10000.0;
+    //const double final_temperature = 100.0;
     double temperature = initial_temperature;
     double start_time = stopwatch.elapsed_millis();
 
@@ -137,44 +133,41 @@ vector<Contest> simulated_annealing(const Stopwatch& stopwatch, int64_t time_lim
 
             // 温度を調整
             double progress = (double)(elapsed - start_time) / (time_limit_millis - start_time);
-            temperature = lerp(initial_temperature, final_temperature, progress);
-            //DEBUG(cerr << "T = " << temperature << '\n';)
+            temperature = initial_temperature * (1.0 - progress) * exp2(-progress);
         }
 
         // 近傍を選ぶ
         enum { kSwap, kReplace } action;
         Contest old;
         int day;
+        int offset;
         int64_t new_score;
-        if(rng.next_double() < 0.5) {
+        if(rng.next_double() < 0.25) {
             // 選んだ日のコンテストをランダムに置き換える
             action = kReplace;
             day = rng() % n_days;
             old = schedule[day];
-            schedule[day] = rng() % 26;
+            Contest next;
+            do {
+                next = rng() % 26;
+            } while(next == old);
+            schedule[day] = next;
             new_score = current_score +
                 calculate_score_delta_on_contest_remove(contest_date_list, day, old) +
-                calculate_score_delta_on_contest_add(contest_date_list, day, schedule[day]);
+                calculate_score_delta_on_contest_add(contest_date_list, day, next);
         } else {
-            // 選んだ日のコンテストを次の日と入れ替える
+            // 選んだ日のコンテストを近くの日と入れ替える
             action = kSwap;
-            day = rng() % (n_days - 1);
+            offset = rng() % 8 + 1;
+            if(n_days - offset <= 0) { offset = 1; }
+            day = rng() % (n_days - offset);
             new_score = current_score +
                 calculate_score_delta_on_contest_remove(contest_date_list, day, schedule[day]) +
-                calculate_score_delta_on_contest_remove(contest_date_list, day+1, schedule[day+1]) +
-                calculate_score_delta_on_contest_add(contest_date_list, day, schedule[day+1]) +
-                calculate_score_delta_on_contest_add(contest_date_list, day+1, schedule[day]);
-            swap(schedule[day], schedule[day+1]);
+                calculate_score_delta_on_contest_remove(contest_date_list, day+offset, schedule[day+offset]) +
+                calculate_score_delta_on_contest_add(contest_date_list, day, schedule[day+offset]) +
+                calculate_score_delta_on_contest_add(contest_date_list, day+offset, schedule[day]);
+            swap(schedule[day], schedule[day+offset]);
         }
-        /*
-        cerr << "schedule = " << schedule << endl;
-        cerr << "i = " << iteration << ", " << action << endl;
-        if(new_score != calculate_score(schedule)) {
-            cerr << "i = " << iteration << ", action = " << action << ", day = " << day << ", old = " << old << ", new = " << schedule[day] << endl;
-            cerr << "new_score = " << new_score << ", score = " << calculate_score(schedule) << ", current = " << current_score << endl;
-            throw runtime_error("abort");
-        }
-        */
 
         // 遷移するか決める
         bool ok;
@@ -201,19 +194,12 @@ vector<Contest> simulated_annealing(const Stopwatch& stopwatch, int64_t time_lim
                 schedule[day] = old;
             } else {
                 contest_date_list[schedule[day]].erase(day);
-                contest_date_list[schedule[day+1]].erase(day+1);
-                contest_date_list[schedule[day]].insert(day+1);
-                contest_date_list[schedule[day+1]].insert(day);
-                swap(schedule[day], schedule[day+1]);
+                contest_date_list[schedule[day+offset]].erase(day+offset);
+                contest_date_list[schedule[day]].insert(day+offset);
+                contest_date_list[schedule[day+offset]].insert(day);
+                swap(schedule[day], schedule[day+offset]);
             }
         }
-
-        /*
-        if(current_score != calculate_score(schedule)) {
-            cerr << "i = " << iteration << ", action = " << action << ", day = " << day << ", old = " << old << endl;
-            throw runtime_error("abort2");
-        }
-        */
     }
 }
 
