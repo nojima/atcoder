@@ -1,5 +1,6 @@
 use std::{io::Read, time::{Duration, Instant}};
-use rand::prelude::*;
+use rand::{Rng, SeedableRng};
+use rand::rngs::SmallRng;
 
 struct Ad {
     x: i32,
@@ -120,8 +121,8 @@ fn output_solution(solution: &[Area]) {
 }
 
 fn hill_climbing(ads: &[Ad]) -> Vec<Area> {
-    let seed = 0xfb5996ea4c99045f2cb03252ec7970a4u128;
-    let mut rng = rand_pcg::Pcg64Mcg::new(seed);
+    let seed = 0x322845c730d6abacu64;
+    let mut rng = SmallRng::seed_from_u64(seed);
 
     let mut solution = make_initial_solution(&ads);
 
