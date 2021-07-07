@@ -1,4 +1,5 @@
-use std::io::Read;
+use std::{io::Read, time::{Duration, Instant}};
+use rand::prelude::*;
 
 struct Ad {
     x: i32,
@@ -65,6 +66,25 @@ fn make_initial_solution(ads: &[Ad]) -> Vec<Area> {
 
 fn is_valid_solution(solution: &[Area]) -> bool {
     for i in 0..solution.len() {
+        let area = &solution[i];
+        if !contains_1d(0, 10001, area.x0) {
+            return false;
+        }
+        if !contains_1d(0, 10001, area.x1) {
+            return false;
+        }
+        if !contains_1d(0, 10001, area.y0) {
+            return false;
+        }
+        if !contains_1d(0, 10001, area.y1) {
+            return false;
+        }
+        if !(area.x0 <= area.x1) {
+            return false;
+        }
+        if !(area.y0 <= area.y1) {
+            return false;
+        }
         for j in i+1..solution.len() {
             if solution[i].overlapps(&solution[j]) {
                 return false
@@ -77,10 +97,6 @@ fn is_valid_solution(solution: &[Area]) -> bool {
 fn pow2(x: f64) -> f64 { x * x }
 
 fn calculate_score(ads: &[Ad], solution: &[Area]) -> i64 {
-    if !is_valid_solution(solution) {
-        return 0;
-    }
-
     let mut score = 0.0;
     for (ad, area) in ads.iter().zip(solution.iter()) {
         let s = area.size();
@@ -103,9 +119,41 @@ fn output_solution(solution: &[Area]) {
     }
 }
 
+fn hill_climbing(ads: &[Ad]) -> Vec<Area> {
+    let seed = 0xfb5996ea4c99045f2cb03252ec7970a4u128;
+    let mut rng = rand_pcg::Pcg64Mcg::new(seed);
+
+    let mut solution = make_initial_solution(&ads);
+
+    let start_at = Instant::now();
+    let deadline = start_at + Duration::from_millis(4980);
+
+    let mut iter = 0;
+    loop {
+        iter += 1;
+
+        if iter % 100 == 0 {
+            // 時間切れか調べる
+            let now = Instant::now();
+            if now >= deadline {
+                break;
+            }
+        }
+
+        // TODO: 解を改善する
+    }
+
+    solution
+}
+
 fn main() {
     let ads = read_input();
-    let mut solution = make_initial_solution(&ads);
+    let solution = hill_climbing(&ads);
     output_solution(&solution);
-    eprintln!("Score: {}", calculate_score(&ads, &solution));
+
+    if is_valid_solution(&solution) {
+        eprintln!("Score: {}", calculate_score(&ads, &solution));
+    } else {
+        eprintln!("Invalid solution!!!!");
+    }
 }
