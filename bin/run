@@ -17,7 +17,7 @@ def main():
     run(args.problem, top_dir, args.case_no)
 
 def run(problem, top_dir, case_no):
-    compile_precompiled_header_file(top_dir)
+    #compile_precompiled_header_file(top_dir)
     compile_cpp_file(problem, top_dir)
     run_binary(problem, case_no)
 
@@ -33,7 +33,7 @@ def compile_precompiled_header_file(top_dir):
 
 def compile_cpp_file(problem, top_dir):
     additional_options = [
-        "-include-pch", path.join(top_dir, "lib/std.hpp.pch"),
+        #"-include-pch", path.join(top_dir, "lib/std.hpp.pch"),
     ]
     compile_source_code(problem.upper() + ".cpp", top_dir, additional_options)
     print("{} \033[30;42;1m{}\033[m".format("Compile:", " OK! "), flush=True)
