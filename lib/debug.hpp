@@ -64,8 +64,4 @@ ostream& operator<<(ostream& os, const optional<T>& v) {
     return os;
 }
 
-#ifdef ONLINE_JUDGE
-#define DEBUG(code)
-#else
-#define DEBUG(code) code
-#endif
+#define TAGGED(obj) #obj << "=" << obj << " "
