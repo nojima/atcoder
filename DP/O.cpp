@@ -16,7 +16,7 @@ int main() {
     vector dp(N, vector(1<<N, mint(0)));
 
     REP(i, N) {
-        foreach_power_set(N, [&](BitSet S) {
+        foreach_subset(N, [&](BitSet S) {
             if (S.size() == i+1) {
                 mint c = 0;
                 REP(j, N) if(S[j] && affinity[i][j]) {

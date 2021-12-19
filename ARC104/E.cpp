@@ -19,7 +19,7 @@ int main() {
         // 長さが k の最長増加部分列がいくつあるか数える
 
         mint cnt;
-        foreach_power_set(N, [&](BitSet S){
+        foreach_subset(N, [&](BitSet S){
             if (S.size() != k) { return; }
 
             // Sが増加列になっている場合の数を数える

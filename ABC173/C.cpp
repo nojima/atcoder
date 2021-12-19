@@ -10,8 +10,8 @@ int main() {
     REP(i, H) { field[i] = read_word(); }
 
     int ans = 0;
-    foreach_power_set(H, [&](BitSet S){
-        foreach_power_set(W, [&](BitSet T){
+    foreach_subset(H, [&](BitSet S){
+        foreach_subset(W, [&](BitSet T){
             int c = 0;
             REP(y, H) if (S[y]) {
                 REP(x, W) if (T[x]) {

@@ -7,7 +7,7 @@ struct BitSet {
     inline int size() const noexcept { return __builtin_popcount(data); }
 };
 template<class Func>
-void foreach_power_set(int n, Func f) {
+void foreach_subset(int n, Func f) {
     for (uint32_t S = 0; S < (uint32_t)(1 << n); ++S) {
         f(BitSet(S));
     }
@@ -25,7 +25,7 @@ int main() {
     }
 
     int ans = numeric_limits<int>::max();
-    foreach_power_set(N, [&](BitSet S) {
+    foreach_subset(N, [&](BitSet S) {
         vector<int> xs(M);
         REP(i, N) if (S[i]) {
             REP(k, M) { xs[k] += A[i][k]; }
