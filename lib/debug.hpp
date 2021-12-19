@@ -64,4 +64,4 @@ ostream& operator<<(ostream& os, const optional<T>& v) {
     return os;
 }
 
-#define TAGGED(obj) #obj << "=" << obj << " "
+#define NAMED(obj) #obj << "=" << obj << " "

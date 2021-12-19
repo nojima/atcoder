@@ -5,9 +5,18 @@ template<class T, class Product>
 struct SegmentTree {
     SegmentTree(int size, const T& identity, const Product& product)
         : n(bit_ceil(size)), data(2*n-1, identity), identity(identity), product(product) {}
+
+    // i番目の要素を取得する
     T get(int i) const { return data[n+i-1]; }
-    T prod(int l, int r) const { return prod(l, r, 0, 0, n); }
+
+    // i番目の要素を更新する
     void set(int i, const T& x) { set(i, x, 0, 0, n); }
+
+    // [l, r) の区間のすべての要素の product による積を返す
+    T prod(int l, int r) const { return prod(l, r, 0, 0, n); }
+
+    // 配列の長さを返す (2の冪に繰り上げられていることに注意)
+    size_t size() const { return n; }
 
 private:
     T prod(int l, int r, int v, int nl, int nr) const {
@@ -37,3 +46,19 @@ private:
     T identity;
     Product product;
 };
+
+template <class T, class Product>
+ostream& operator<<(ostream& os, const SegmentTree<T, Product>& v) {
+    os << "[";
+    bool first = true;
+    for (size_t i = 0; i < v.size(); ++i) {
+        if (first) {
+            first = false;
+        } else {
+            os << ", ";
+        }
+        os << v.get(i);
+    }
+    os << "]";
+    return os;
+}
