@@ -61,15 +61,11 @@ public:
     }
 
     // Operators
-    bool    operator<  (const BitSet& rhs) const noexcept { return S <  rhs.S; }
-    bool    operator== (const BitSet& rhs) const noexcept { return S == rhs.S; }
-    BitSet& operator+= (const BitSet& rhs) noexcept { S +=  rhs.S; return *this; }
-    BitSet& operator-= (const BitSet& rhs) noexcept { S -=  rhs.S; return *this; }
-    BitSet& operator|= (const BitSet& rhs) noexcept { S |=  rhs.S; return *this; }
-    BitSet& operator&= (const BitSet& rhs) noexcept { S &=  rhs.S; return *this; }
-    BitSet& operator^= (const BitSet& rhs) noexcept { S ^=  rhs.S; return *this; }
-    BitSet& operator<<=(const BitSet& rhs) noexcept { S <<= rhs.S; return *this; }
-    BitSet& operator>>=(const BitSet& rhs) noexcept { S >>= rhs.S; return *this; }
+    inline bool    operator< (const BitSet& rhs) const noexcept { return S <  rhs.S; }
+    inline bool    operator==(const BitSet& rhs) const noexcept { return S == rhs.S; }
+    inline BitSet& operator|=(const BitSet& rhs) noexcept { S |= rhs.S; return *this; }
+    inline BitSet& operator&=(const BitSet& rhs) noexcept { S &= rhs.S; return *this; }
+    inline BitSet& operator^=(const BitSet& rhs) noexcept { S ^= rhs.S; return *this; }
 };
 
 // 集合 {0, 1, .., n-1} のすべての部分集合を列挙する。
