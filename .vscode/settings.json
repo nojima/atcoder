@@ -1,1 +1,6 @@
-{}
+{
+    "files.associations": {
+        "tuple": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}
