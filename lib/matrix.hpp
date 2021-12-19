@@ -1,5 +1,6 @@
 #pragma once
 #include "lib/std.hpp"
+#include "lib/pow.hpp"
 
 template <class T>
 using Matrix = vector<vector<T>>;
@@ -43,4 +44,16 @@ Matrix<T> identity_matrix(size_t n) {
         ret[i][i] = 1;
     }
     return ret;
+}
+
+// 正方行列 mat の n 乗を返す。
+template <class T>
+Matrix<T> matrix_pow(const Matrix<T>& mat, int64_t n) {
+    assert(mat.size() == mat[0].size());
+    return generic_pow(
+        mat,
+        n,
+        identity_matrix<T>(mat.size()),
+        [](const Matrix<T>& lhs, const Matrix<T>& rhs) { return matrix_mul(lhs, rhs); }
+    );
 }

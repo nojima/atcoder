@@ -1,7 +1,6 @@
 #include "lib/prelude.hpp"
 #include "lib/modint.hpp"
 #include "lib/matrix.hpp"
-#include "lib/pow.hpp"
 
 using mint = ModInt<int(1e9+7)>;
 using matrix = Matrix<mint>;
@@ -14,11 +13,7 @@ int main() {
         adj[v][w] = mint(read_int());
     }
 
-    auto adj_k = generic_pow(
-        adj, K,
-        identity_matrix<mint>(N),
-        [](const matrix& lhs, const matrix& rhs) { return matrix_mul(lhs, rhs); }
-    );
+    auto adj_k = matrix_pow(adj, K);
 
     vector d_0(N, mint(1));
     auto d_k = matrix_vector_mul(adj_k, d_0);
