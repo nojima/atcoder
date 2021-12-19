@@ -3,8 +3,8 @@
 
 int main() {
     vector<uint32_t> actual1;
-    foreach_subset_of(BitSet(0b1101), [&](BitSet S) {
-        actual1.push_back(S.data);
+    BitSet(0b1101).foreach_subset([&](BitSet S) {
+        actual1.push_back(S.raw());
     });
     vector<uint32_t> expected1 = {
         0b0000, 0b0001, 0b0100, 0b0101,
@@ -13,8 +13,8 @@ int main() {
     assert(actual1 == expected1);
 
     vector<uint32_t> actual2;
-    foreach_subset_with_size(5, 3, [&](BitSet S) {
-        actual2.push_back(S.data);
+    foreach_combination(5, 3, [&](BitSet S) {
+        actual2.push_back(S.raw());
     });
     // C(5, 3) = 5*4 / 2*1 = 10
     vector<uint32_t> expected2 = {

@@ -32,10 +32,13 @@ def compile_precompiled_header_file(top_dir):
         compile_source_code(filename, top_dir, additional_options)
 
 def compile_cpp_file(problem, top_dir):
+    source_path = problem
+    if not path.exists(source_path):
+        source_path = problem.upper() + ".cpp"
     additional_options = [
         #"-include-pch", path.join(top_dir, "lib/std.hpp.pch"),
     ]
-    compile_source_code(problem.upper() + ".cpp", top_dir, additional_options)
+    compile_source_code(source_path, top_dir, additional_options)
     print("{} \033[30;42;1m{}\033[m".format("Compile:", " OK! "), flush=True)
 
 def compile_source_code(filename, top_dir, additional_options):

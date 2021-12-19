@@ -1,20 +1,75 @@
 #pragma once
 #include "std.hpp"
-#include <boost/iterator/iterator_adaptor.hpp>
+#include <boost/operators.hpp>
 
-struct BitSet {
-    const uint32_t data;
-    explicit BitSet(uint32_t data): data(data) {}
+struct BitSet : private boost::operators<BitSet> {
+    uint32_t S;
+
+public:
+    explicit BitSet(uint32_t S): S(S) {}
+
+    // 集合 {0, 1, .., n-1} を返す。
+    static inline BitSet from_size(int n) noexcept {
+        return BitSet((1 << n) - 1);
+    }
+
+    // i ∈ S ならば true を返す。
     inline bool operator[](int i) const noexcept {
-        return (data >> i) & 1;
+        return (S >> i) & 1;
     }
+
+    // S ⊆ other ならば true を返す。
+    inline bool is_subset_of(BitSet other) const noexcept {
+        return (S & other.S) == S;
+    }
+
+    // S ∪ {i} を返す。
+    [[nodiscard]] inline BitSet insert(int i) const noexcept {
+        return BitSet(S | (1 << i));
+    }
+
+    // S \ {i} を返す。
+    [[nodiscard]] inline BitSet remove(int i) const noexcept {
+        return BitSet(S & ~(1 << i));
+    }
+
+    // S \ other を返す。
+    [[nodiscard]] inline BitSet exclude(BitSet other) const noexcept {
+        return BitSet(S & ~other.S);
+    }
+
+    // |S| を返す。
     inline int size() const noexcept {
-        return __builtin_popcount(data);
+        return __builtin_popcount(S);
     }
-    inline BitSet exclude(int i) const noexcept {
-        assert((*this)[i]);
-        return BitSet(data ^ (1 << i));
+
+    // 生の表現を返す。
+    inline uint32_t raw() const noexcept {
+        return S;
     }
+
+    // S のすべての部分集合(∅ と S 自身を含む)を列挙する。
+    template <class Func>
+    void foreach_subset(Func f) {
+        uint32_t whole = S;
+        uint32_t subset = 0;
+        for (;;) {
+            f(BitSet(subset));
+            if (subset == whole) { return; }
+            subset = (subset - whole) & whole;
+        }
+    }
+
+    // Operators
+    bool    operator<  (const BitSet& rhs) const noexcept { return S <  rhs.S; }
+    bool    operator== (const BitSet& rhs) const noexcept { return S == rhs.S; }
+    BitSet& operator+= (const BitSet& rhs) noexcept { S +=  rhs.S; return *this; }
+    BitSet& operator-= (const BitSet& rhs) noexcept { S -=  rhs.S; return *this; }
+    BitSet& operator|= (const BitSet& rhs) noexcept { S |=  rhs.S; return *this; }
+    BitSet& operator&= (const BitSet& rhs) noexcept { S &=  rhs.S; return *this; }
+    BitSet& operator^= (const BitSet& rhs) noexcept { S ^=  rhs.S; return *this; }
+    BitSet& operator<<=(const BitSet& rhs) noexcept { S <<= rhs.S; return *this; }
+    BitSet& operator>>=(const BitSet& rhs) noexcept { S >>= rhs.S; return *this; }
 };
 
 // 集合 {0, 1, .., n-1} のすべての部分集合を列挙する。
@@ -25,21 +80,9 @@ void foreach_subset(int n, Func f) {
     }
 }
 
-// S のすべての部分集合(∅ と S 自身を含む)を列挙する。
-template <class Func>
-void foreach_subset_of(BitSet S, Func f) {
-    uint32_t whole = S.data;
-    uint32_t subset = 0;
-    for (;;) {
-        f(BitSet(subset));
-        if (subset == whole) { return; }
-        subset = (subset - whole) & whole;
-    }
-}
-
 // 要素数が k であるような {0, 1, .., n-1} の部分集合をすべて列挙する。
 template <class Func>
-void foreach_subset_with_size(int n, int k, Func f) {
+void foreach_combination(int n, int k, Func f) {
     // 蟻本 p144 より
     uint32_t subset = (1 << k) - 1;
     while (subset < (uint32_t)(1 << n)) {
