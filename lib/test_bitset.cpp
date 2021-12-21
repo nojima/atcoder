@@ -22,4 +22,11 @@ int main() {
         0b10101, 0b10110, 0b11001, 0b11010, 0b11100,
     };
     assert(actual2 == expected2);
+
+    vector<int> actual3;
+    BitSet(0b010011010).foreach_element([&](int i) {
+        actual3.push_back(i);
+    });
+    vector<int> expected3 = {1, 3, 4, 7};
+    assert(actual3 == expected3);
 }
